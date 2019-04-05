@@ -6,11 +6,13 @@
 #' 
 #' @export
 
-get_screenshot <- function(url, width = 1280, height = 1280) {
+get_screenshot <- function(url, width = 1280, height = 1280, language = NULL) {
+  
   dir.create(path = "data", showWarnings = FALSE)
   dir.create(path = file.path("data", "domains"), showWarnings = FALSE)
   dir.create(path = file.path("data", "domains", "screenshots"), showWarnings = FALSE)
-  today_path <- file.path("data", "domains", "screenshots", Sys.Date())
+  dir.create(path = file.path("data", "domains", "screenshots", language), showWarnings = FALSE)
+  today_path <- file.path("data", "domains", "screenshots", language, Sys.Date())
   dir.create(path = today_path, showWarnings = FALSE)
   
   pb <- dplyr::progress_estimated(length(url))

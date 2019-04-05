@@ -4,7 +4,7 @@
 \alias{get_screenshot}
 \title{Get screenshots and place them in relevant subfolder}
 \usage{
-get_screenshot(url, width = 1280, height = 1280)
+get_screenshot(url, width = 1280, height = 1280, language = NULL)
 }
 \arguments{
 \item{url}{A character vector of one or more urls.}

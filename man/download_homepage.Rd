@@ -4,16 +4,16 @@
 \alias{download_homepage}
 \title{Download homepages by url in relevant sub-folder.}
 \usage{
-download_homepage(domain, language)
+download_homepage(domain = NULL, language = NULL)
 }
 \arguments{
-\item{url}{A character vector of one or more domain names.}
+\item{domain}{A character vector of one or more domain names.}
 }
 \value{
 Nothing, used for its side effects.
 }
 \description{
-Download homepages by url in relevant sub-folder, divide by date of download. By default, does not overwrite.
+Download homepages by url in relevant sub-folder, divide by date of download. By default, does not overwrite, and shuffles the order in which given domain names are downloaded.
 }
 \examples{
 
