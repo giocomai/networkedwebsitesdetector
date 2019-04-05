@@ -15,7 +15,7 @@ golem::add_module( name = "my_other_module") # Name of the module
 
 # usethis::use_package("pkg") # To call each time you need a new package
 usethis::use_package("stringr")
-usethis::use_package("urltools")
+usethis::use_package("xml2")
 
 ## 2.3 Add tests
 

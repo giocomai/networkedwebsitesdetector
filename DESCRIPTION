@@ -13,7 +13,9 @@ Imports:
     webshot,
     purrr,
     stringr,
-    urltools
+    urltools,
+    rvest,
+    xml2
 Remotes: 
     Thinkr-open/golem
 RoxygenNote: 6.1.1
