@@ -8,8 +8,7 @@
 
 extract_domains_from_tweets <- function(language = NULL) {
   if (is.null(language)==TRUE) {
-    language <- list.dirs(file.path("data", "tweets"), recursive = FALSE) %>%
-      stringr::str_remove(pattern = stringr::fixed("data/tweets/"))
+    language <- list.dirs(file.path("data", "domains", "homepage"), recursive = FALSE, full.names = FALSE)
   }
   dir.create(path = file.path("data", "domains"), showWarnings = FALSE)
   dir.create(path = file.path("data", "domains", "domain_name"), showWarnings = FALSE)

@@ -8,7 +8,9 @@
 #' @export
 
 get_screenshot <- function(domain, width = 1280, height = 1280, language = NULL, shuffle = TRUE) {
-  
+  if (is.null(language)==TRUE) {
+    language <- list.dirs(file.path("data", "domains", "homepage"), recursive = FALSE, full.names = FALSE)
+  }
   dir.create(path = "data", showWarnings = FALSE)
   dir.create(path = file.path("data", "domains"), showWarnings = FALSE)
   dir.create(path = file.path("data", "domains", "screenshots"), showWarnings = FALSE)
