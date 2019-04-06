@@ -1,12 +1,13 @@
 #' Get screenshots and place them in relevant subfolder
 #'
-#' @param domain A character vector of one or more domains (e.g. "example.com"). 
+#' @param domain A character vector of one or more domains (e.g. "example.com").
+#' @param shuffle Logical, defaults to TRUE. If TRUE, order in which domains are processed is randomised.  
 #' @return Nothing, used for its side effects. 
 #' @examples
 #' 
 #' @export
 
-get_screenshot <- function(domain, width = 1280, height = 1280, language = NULL) {
+get_screenshot <- function(domain, width = 1280, height = 1280, language = NULL, shuffle = TRUE) {
   
   dir.create(path = "data", showWarnings = FALSE)
   dir.create(path = file.path("data", "domains"), showWarnings = FALSE)
@@ -20,6 +21,9 @@ get_screenshot <- function(domain, width = 1280, height = 1280, language = NULL)
   dir.create(path = today_path, showWarnings = FALSE)
   dir.create(path = today_path_screenshots_failed, showWarnings = FALSE)
   
+  if (shuffle == TRUE) {
+    domain <- sample(domain)
+  }
   pb <- dplyr::progress_estimated(length(domain))
   purrr::walk(.x = domain,
               .f =  function(x) {pb$tick()$print()

@@ -4,10 +4,13 @@
 \alias{get_screenshot}
 \title{Get screenshots and place them in relevant subfolder}
 \usage{
-get_screenshot(domain, width = 1280, height = 1280, language = NULL)
+get_screenshot(domain, width = 1280, height = 1280, language = NULL,
+  shuffle = TRUE)
 }
 \arguments{
 \item{domain}{A character vector of one or more domains (e.g. "example.com").}
+
+\item{shuffle}{Logical, defaults to TRUE. If TRUE, order in which domains are processed is randomised.}
 }
 \value{
 Nothing, used for its side effects.
