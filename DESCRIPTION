@@ -15,7 +15,8 @@ Imports:
     stringr,
     urltools,
     rvest,
-    xml2
+    xml2,
+    fs
 Remotes: 
     Thinkr-open/golem
 RoxygenNote: 6.1.1
