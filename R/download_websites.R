@@ -9,7 +9,7 @@
 #' @export
 #' 
 
-download_homepage <- function(domain = NULL, language = NULL) {
+get_homepage <- function(domain = NULL, language = NULL) {
   if (is.null(language)==TRUE) {
     language <- list.dirs(file.path("data", "tweets"), recursive = FALSE) %>%
       stringr::str_remove(pattern = stringr::fixed("data/tweets/"))
@@ -41,7 +41,7 @@ download_homepage <- function(domain = NULL, language = NULL) {
                    error=function(e){
                      
                      readr::write_file(x = paste0("Could not download ", j),
-                                path = file.path(today_path_homepage_failed, paste0(j, ".txt")))
+                                       path = file.path(today_path_homepage_failed, paste0(j, ".txt")))
                      
                      message(paste0("Could not download ", j, ": "),
                              conditionMessage(e), "\n")})

@@ -2,9 +2,9 @@
 
 export("%>%")
 export(check_if_exists)
-export(download_homepage)
 export(extract_domains_from_tweets)
 export(extract_identifiers)
+export(get_homepage)
 export(get_screenshot)
 export(run_app)
 import(shiny)
