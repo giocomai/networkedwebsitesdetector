@@ -4,10 +4,13 @@
 \alias{extract_identifiers}
 \title{Extract identifiers from web pages}
 \usage{
-extract_identifiers(language = NULL, progress_bar = TRUE)
+extract_identifiers(language = NULL, progress_bar = TRUE,
+  sample = NULL)
 }
 \arguments{
-\item{language}{A character vector of language two letter codes. Defaults to NULL. If NULL, processes available languages.}
+\item{language}{A character vector of length one corresponding to a language two-letter code. Defaults to NULL. If NULL, processes available language. If more than one, throws error.}
+
+\item{sample}{Defaults to NULL. If given, it processess only a sample of the available files of the size given with this parameter.}
 }
 \value{
 Nothing, used for its side effects.

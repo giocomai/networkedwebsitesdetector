@@ -1,93 +1,98 @@
 #' Extract identifiers from web pages
 #'
-#' @param language A character vector of language two letter codes. Defaults to NULL. If NULL, processes available languages.
+#' @param language A character vector of length one corresponding to a language two-letter code. Defaults to NULL. If NULL, processes available language. If more than one, throws error. 
+#' @param sample Defaults to NULL. If given, it processess only a sample of the available files of the size given with this parameter. 
 #' @return Nothing, used for its side effects. 
 #' @examples
 #' 
 #' @export
 #' 
 
-extract_identifiers <- function(language = NULL, progress_bar = TRUE) {
+extract_identifiers <- function(language = NULL, progress_bar = TRUE, sample = NULL) {
   if (is.null(language)==TRUE) {
     language <- list.dirs(file.path("data", "domains", "homepage"), recursive = FALSE, full.names = FALSE)
   }
   
   dir.create(file.path("data", "identifiers"), showWarnings = FALSE)
+  dir.create(file.path("data", "identifiers", language), showWarnings = FALSE)
+  html_location <- file.path("data", "domains", "homepage", language)
   
-  for (i in language) {
-    dir.create(file.path("data", "identifiers", i), showWarnings = FALSE)
-
-    html_location <- file.path("data", "domains", "homepage", i)
-    
-    html_files <- list.files(path = html_location, full.names = TRUE, pattern = "html", recursive = TRUE)
-    
-    domains <- list.files(path = html_location, full.names = FALSE, pattern = "html", recursive = TRUE) %>%
-      stringr::str_remove(pattern = stringr::fixed(".html")) %>% 
-      stringr::str_remove(pattern = ".*\\/")
-    
-    ua <- vector(mode = "character", length = length(html_files))
-    ca_pub <- vector(mode = "character", length = length(html_files))
-    fb_admins <- vector(mode = "character", length = length(html_files))
-    fb_page_id <- vector(mode = "character", length = length(html_files))
-    fb_app_id <- vector(mode = "character", length = length(html_files))
-    
-    if (progress_bar == TRUE) {
-      pb <- dplyr::progress_estimated(n = length(html_files), min_time = 1)
-    }
-    for (j in seq_along(html_files)) {
-      if (progress_bar == TRUE) {
-        pb$tick()$print()
-      }
-      
-      temp <-  tryCatch(expr = paste(readLines(html_files[j]), collapse = "\n"),
-                        error = function(e) {
-                          warning(paste("Could not read", html_files[j]))
-                          NA
-                        })
-      ua[j] <- stringr::str_extract_all(string = temp,
-                                        pattern = stringr::regex("UA-[[:digit:]][[:digit:]][[:digit:]][[:digit:]]+", ignore_case = FALSE))
-      ca_pub[j] <- stringr::str_extract_all(string = temp,
-                                            pattern = stringr::regex("ca-pub-[[:digit:]][[:digit:]]+", ignore_case = TRUE))
-      
-      temp <-  tryCatch(expr = xml2::read_html(html_files[j]),
-                        error = function(e) {
-                          warning(paste("Could not parse", html_files[j]))
-                          NA
-                        })
-      
-      if(is.na(temp)==FALSE&is.element(el = "xml_node", set = class(temp))) {
-        fb_admins_temp <- temp %>% 
-          rvest::html_nodes(xpath = '//meta[@property="fb:admins"]') %>% 
-          rvest::html_attr('content')
-        
-        if (length(fb_admins_temp)>0) {fb_admins[j] <- fb_admins_temp}
-        
-        fb_page_id_temp <- temp %>% 
-          rvest::html_nodes(xpath = '//meta[@property="fb:page_id"]') %>% 
-          rvest::html_attr('content')
-        
-        if (length(fb_page_id_temp)>0) {fb_page_id[j] <- fb_page_id_temp}
-        
-        
-        fb_app_id_temp <- temp %>% 
-          rvest::html_nodes(xpath = '//meta[@property="fb:app_id"]') %>% 
-          rvest::html_attr('content')
-        
-        if (length(fb_app_id_temp)>0) {fb_app_id[j] <- fb_app_id_temp}
-
-      }
-      
-    }
-    
-    id_df <- tibble::tibble(domain = domains,
-                            ua = ua, 
-                            ca_pub = ca_pub,
-                            fb_admins = fb_admins, 
-                            fb_page_id = fb_page_id, 
-                            fb_app_id = fb_app_id)
-    
-    base_folder <- file.path("data", "identifiers", i, Sys.Date())
-    dir.create(base_folder, showWarnings = FALSE)
-    saveRDS(object = id_df, file = file.path("id", i, Sys.Date(), "id_df.rds"))
+  html_files <- fs::dir_ls(path = html_location, recursive = TRUE, type = "file")
+  
+  if (is.null(sample)==FALSE) {
+    html_files <- sample(x = html_files, size = sample)
   }
+  
+  html_dir <- fs::path_dir(path = html_files)
+  domains <- fs::path_ext_remove(path = stringr::str_remove(string = html_files,
+                                                            pattern = stringr::fixed(paste0(html_dir, "/"))))
+
+  ua             <- rep(x = as.character(NA), length = length(html_files))
+  ca_pub         <- rep(x = as.character(NA), length = length(html_files))
+  fb_admins      <- rep(x = as.character(NA), length = length(html_files))
+  fb_page_id     <- rep(x = as.character(NA), length = length(html_files))
+  fb_app_id      <- rep(x = as.character(NA), length = length(html_files))
+  
+  if (progress_bar == TRUE) {
+    pb <- dplyr::progress_estimated(n = length(html_files), min_time = 1)
+  }
+  for (j in seq_along(html_files)) {
+    if (progress_bar == TRUE) {
+      pb$tick()$print()
+    }
+    
+    temp <-  tryCatch(expr = paste(readLines(html_files[j]), collapse = "\n"),
+                      error = function(e) {
+                        warning(paste("Could not read", html_files[j]))
+                        NA
+                      })
+    ua[j] <- stringr::str_extract_all(string = temp,
+                                      pattern = stringr::regex("UA-[[:digit:]][[:digit:]][[:digit:]][[:digit:]]+", ignore_case = FALSE))
+    ca_pub[j] <- stringr::str_extract_all(string = temp,
+                                          pattern = stringr::regex("ca-pub-[[:digit:]][[:digit:]]+", ignore_case = TRUE))
+    
+    temp <-  tryCatch(expr = xml2::read_html(html_files[j]),
+                      error = function(e) {
+                        warning(paste("Could not parse", html_files[j]))
+                        NA
+                      })
+    
+    if(is.na(temp)==FALSE&is.element(el = "xml_node", set = class(temp))) {
+      fb_admins_temp <- temp %>% 
+        rvest::html_nodes(xpath = '//meta[@property="fb:admins"]') %>% 
+        rvest::html_attr('content')
+      
+      if (length(fb_admins_temp)>0) {fb_admins[j] <- stringr::str_split(string = fb_admins_temp, pattern = ",")}
+      
+      fb_page_id_temp <- temp %>% 
+        rvest::html_nodes(xpath = '//meta[@property="fb:page_id"]') %>% 
+        rvest::html_attr('content')
+      
+      if (length(fb_page_id_temp)>0) {fb_page_id[j] <- stringr::str_split(string = fb_page_id_temp, pattern = ",")}
+      
+      
+      fb_app_id_temp <- temp %>% 
+        rvest::html_nodes(xpath = '//meta[@property="fb:app_id"]') %>% 
+        rvest::html_attr('content')
+      
+      if (length(fb_app_id_temp)>0) {fb_app_id[j] <- stringr::str_split(string = fb_app_id_temp, pattern = ",")}
+      
+    }
+    
+  }
+  
+  identifiers_df <- tibble::tibble(domain = domains,
+                                   ua = ua, 
+                                   ca_pub = ca_pub,
+                                   fb_admins = fb_admins, 
+                                   fb_page_id = fb_page_id, 
+                                   fb_app_id = fb_app_id)
+  
+  
+  base_folder <- file.path("data", "identifiers", language, Sys.Date())
+  dir.create(file.path("data", "identifiers"), showWarnings = FALSE)
+  dir.create(file.path("data", "identifiers", language), showWarnings = FALSE)
+  dir.create(base_folder, showWarnings = FALSE)
+  saveRDS(object = identifiers_df, file = file.path(base_folder, "identifiers_df.rds"))
+  return(identifiers_df)
 }
