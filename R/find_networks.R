@@ -45,7 +45,7 @@ find_related_domains <- function(domain,
       # do nothing
     } else if (length(temp_alt_id)==0) {
       # do nothing
-    } else if (is.na(temp_alt_id)) {
+    } else if (is.na(temp_alt_id[1])) {
       # do nothing
     } else {
       temp_alt_id <- temp_alt_id[temp_alt_id!=""&is.na(temp_alt_id)==FALSE]
@@ -104,4 +104,5 @@ add_network_id <- function(identifiers_df) {
       identifiers_df$network_id[identifiers_df$domain %in% related_domains] <- i
     }
   }
+  return(identifiers_df)
 }

@@ -76,3 +76,33 @@ load_latest_identifiers_df <- function(language = NULL) {
   base_path <- file.path("data", "identifiers", language)
   readRDS(file = fs::dir_ls(fs::dir_ls(path = base_path) %>% tail(1)))
 }
+
+#' Check if there are unusually small or unusually big files
+#'
+#' @param min_size Minimum size in bytes, defaults to 0 (only files of size 0 are selected).
+#' @param max_size Maximum size in bytes, defaults to about 100 megabytes.
+#' @param remove_exceeding Logical, defaults to FALSE. If TRUE, listed files are removed.
+#' @return If remove_exceeding==FALSE, returns a data frame with reference to files exceeding given criteria. 
+#' @examples
+#' 
+#' @export
+#' 
+
+clean_files <- function(min_size = 0,
+                        max_size = 1e8,
+                        remove_exceeding = FALSE,
+                        language = NULL) {
+  if (is.null(language)==TRUE) {
+    language <- list.dirs(file.path("data", "domains", "homepage"), recursive = FALSE, full.names = FALSE)
+  }
+  file_info <- fs::dir_info(path = file.path("data", "domains", "homepage", language), recursive = TRUE, type = "file")
+  
+  file_exceeding <- file_info %>%
+    dplyr::filter(size <= fs::as_fs_bytes(x = min_size) | size > fs::as_fs_bytes(x = max_size))
+  
+  if (remove_exceeding==TRUE) {
+    file_exceeding %>% dplyr::pull(path) %>% fs::file_delete()
+  }
+  file_exceeding
+}
+
