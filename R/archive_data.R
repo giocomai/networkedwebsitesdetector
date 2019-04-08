@@ -51,3 +51,25 @@ archive_screenshots <- function(language = NULL) {
                }, 
                type = "directory")
 }
+
+
+#' Restore archived folders. 
+#'
+#' It restores .tar.gz files stored in the `archive` folder.
+#' 
+#' @export
+#' 
+
+restore_html <- function(language = NULL) {
+  if (is.null(language)==TRUE) {
+    language <- list.dirs(file.path("data", "domains", "homepage"), recursive = FALSE, full.names = FALSE)
+  }
+  base_path <- file.path("data", "domains", "homepage", language)
+  archive_path <- file.path("archive", "domains", "homepage", language)
+  
+  fs::dir_walk(path = archive_path,
+               fun = function (x) {
+                 untar(tarfile = x)
+               }, 
+               type = "file")
+}
