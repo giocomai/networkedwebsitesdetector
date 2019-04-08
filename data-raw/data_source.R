@@ -5,7 +5,8 @@ default_excluded_fb_admins <- c("YOUR USER ID",
 usethis::use_data(default_excluded_fb_admins, overwrite = TRUE)
 
 default_excluded_fb_app_id <- c("Facebook App ID here", 
-                                "966242223397117") #default app id
+                                "966242223397117", #default app id
+                                "249643311490") # used by all wordpress.com websites
 
 usethis::use_data(default_excluded_fb_app_id, overwrite = TRUE)
 

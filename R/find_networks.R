@@ -48,38 +48,39 @@ find_related_domains <- function(domain,
       # do nothing
     } else if (length(temp_alt_id)==0) {
       # do nothing
-    } else if (is.na(temp_alt_id[1])) {
-      # do nothing
     } else {
       temp_alt_id <- temp_alt_id[temp_alt_id!=""&is.na(temp_alt_id)==FALSE]
       
-      temp_domains_pre <- temp_domains
-      temp_domains_post <- c(temp_domains_pre, temp_domains_pre)
-      
-      while(length(temp_domains_pre)<length(temp_domains_post)) {
-        temp_domains_pre <- unique(temp_domains_post)
+      if (length(temp_alt_id)>0) {
+        temp_domains_pre <- temp_domains
+        temp_domains_post <- c(temp_domains_pre, temp_domains_pre)
         
-        # extract all id of given type present in subset
-        temp_alt <- identifiers_df %>% 
-          dplyr::filter(is.element(el = domain, set = temp_domains_pre)) %>% 
-          dplyr::select(domain, i) %>% 
-          tidyr::unnest() %>% 
-          dplyr::pull(i) %>%
-          base::unique()
-        
-        temp_alt <- temp_alt[temp_alt!=""]
-        
-        if (length(temp_alt)>0) {
-          temp_identifiers_df  <- identifiers_df %>% 
-            dplyr::select(domain, i) %>% 
-            tidyr::unnest()
+        while(length(temp_domains_pre)<length(temp_domains_post)) {
+          temp_domains_pre <- unique(temp_domains_post)
           
-          temp_identifiers_df <- temp_identifiers_df[temp_identifiers_df %>% dplyr::pull(i) %in% temp_alt, 1:2]
-          temp_domains_post <- temp_identifiers_df %>%
-            dplyr::distinct(domain) %>%
-            dplyr::pull(domain)
-        } else {
-          temp_domains_post <- temp_domains_pre
+          # extract all id of given type present in subset
+          temp_alt <- identifiers_df %>% 
+            dplyr::filter(is.element(el = domain, set = temp_domains_pre)) %>% 
+            dplyr::select(domain, i) %>% 
+            tidyr::unnest() %>% 
+            dplyr::pull(i) %>%
+            base::unique()
+          
+          temp_alt <- temp_alt[temp_alt!=""&is.na(temp_alt)==FALSE]
+          
+          if (length(temp_alt)>0) {
+            temp_identifiers_df  <- identifiers_df %>% 
+              dplyr::select(domain, i) %>% 
+              tidyr::unnest()
+            
+            temp_identifiers_df <- temp_identifiers_df[temp_identifiers_df %>% dplyr::pull(i) %in% temp_alt, 1:2]
+            temp_domains_post <- temp_identifiers_df %>%
+              dplyr::distinct(domain) %>%
+              dplyr::pull(domain)
+          } else {
+            temp_domains_post <- temp_domains_pre
+          }
+          
         }
         
       }
