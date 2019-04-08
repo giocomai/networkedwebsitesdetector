@@ -77,6 +77,21 @@ load_latest_identifiers_df <- function(language = NULL) {
   readRDS(file = fs::dir_ls(fs::dir_ls(path = base_path) %>% tail(1)))
 }
 
+#' Load all identifiers_df
+#'
+#' @return A data.frame (a tibble), made of data frames typically generated with `extract_identifiers()`
+#' @examples
+#' 
+#' @export
+#' 
+load_identifiers_df <- function(language = NULL) {
+  if (is.null(language)==TRUE) {
+    language <- list.dirs(file.path("data", "identifiers"), recursive = FALSE, full.names = FALSE)
+  }
+  base_path <- file.path("data", "identifiers", language)
+  purrr::map_dfr(.x = fs::dir_ls(fs::dir_ls(path = base_path)), .f = readRDS)
+}
+
 #' Check if there are unusually small or unusually big files
 #'
 #' @param min_size Minimum size in bytes, defaults to 0 (only files of size 0 are selected).
