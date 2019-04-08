@@ -12,6 +12,14 @@
 #' @format A character vector.
 "default_excluded_fb_admins"
 
+#' ua ID to be excluded by default
+#'
+#'This includes ID such as the ua id used by large hosts such as wordpress.com.
+#'
+#' @format A character vector.
+"default_excluded_ua"
+
+
 #' Type of snippets used to identify networked websites
 #'
 #'This includes, among others, Google Analytics and Google Adsense codes, as well as Facebook identifiers

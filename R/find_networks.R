@@ -23,6 +23,9 @@ find_related_domains <- function(domain,
     temp <- identifiers_df %>% 
       dplyr::filter(is.element(el = identifiers_df$domain, set = temp_domains))
     ## clean up
+    if (i == "ua") {
+      temp$ua[[1]][is.element(el = default_excluded_ua, set = temp$ua)] <- NA
+    }
     if (i == "fb_admins") {
       temp$fb_admins[[1]][is.element(el = default_excluded_fb_admins, set = temp$fb_admins)] <- NA
     }
