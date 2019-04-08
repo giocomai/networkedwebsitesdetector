@@ -50,11 +50,9 @@ find_related_domains <- function(domain,
       # do nothing
     } else {
       temp_alt_id <- temp_alt_id[temp_alt_id!=""&is.na(temp_alt_id)==FALSE]
-      
+      temp_domains_pre <- temp_domains
+      temp_domains_post <- c(temp_domains_pre, temp_domains_pre)
       if (length(temp_alt_id)>0) {
-        temp_domains_pre <- temp_domains
-        temp_domains_post <- c(temp_domains_pre, temp_domains_pre)
-        
         while(length(temp_domains_pre)<length(temp_domains_post)) {
           temp_domains_pre <- unique(temp_domains_post)
           
