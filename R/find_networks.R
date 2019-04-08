@@ -1,6 +1,7 @@
 #' Get screenshots and place them in relevant subfolder
 #'
 #' @param language A character vector of language two letter codes. Defaults to NULL. If NULL, processes available languages.
+#' @param run_n Number of times to go through all identifiers. For example, if a new domain is found within the network through a common fb_app_id, it may be useful to see if the new domain has any ca_pub codes with others. 
 #' @return Nothing, used for its side effects. 
 #' @examples
 #' 
@@ -8,26 +9,25 @@
 
 
 find_related_domains <- function(domain,
-                                 identifiers_df,
+                                 identifiers_df = load_latest_identifiers_df(),
                                  identifiers = default_identifiers,
-                                 language = NULL) {
+                                 language = NULL,
+                                 run_n = 3) {
   temp_domains <- domain
   
-  for (i in identifiers) {
+  for (i in rep(x = identifiers, run_n)) {
     #message(i)
     if (length(temp_domains)==0) {
       temp_domains <- domain
     }
-    
-    temp <- id_df %>% 
-      filter(is.element(el = domain, set = temp_domains))
-    
+    temp <- identifiers_df %>% 
+      dplyr::filter(is.element(el = identifiers_df$domain, set = temp_domains))
     ## clean up
     if (i == "fb_admins") {
-      temp$fb_admins[temp$fb_admins=="YOUR USER ID"|temp$fb_admins=="Facebook Admin ID here"] <- ""
+      temp$fb_admins[[1]][is.element(el = default_excluded_fb_admins, set = temp$fb_admins)] <- NA
     }
     if (i == "fb_app_id") {
-      temp$fb_app_id[temp$fb_app_id=="Facebook App ID here"|temp$fb_app_id=="966242223397117"] <- ""
+      temp$fb_app_id[[1]][is.element(el = default_excluded_fb_app_id, set = temp$fb_app_id)] <- NA
     }
     
     if (nrow(temp)==0) {
@@ -35,15 +35,17 @@ find_related_domains <- function(domain,
     }
     
     temp_alt_id <-  temp %>% 
-      select(domain, i) %>% 
-      unnest() %>% 
-      pull(i) %>%
-      unique() 
+      dplyr::select(domain, i) %>% 
+      tidyr::unnest() %>% 
+      dplyr::pull(i) %>%
+      base::unique() 
     
     
     if (identical(x = "", y = temp_alt_id)) {
       # do nothing
     } else if (length(temp_alt_id)==0) {
+      # do nothing
+    } else if (is.na(temp_alt_id)) {
       # do nothing
     } else {
       temp_alt_id <- temp_alt_id[temp_alt_id!=""&is.na(temp_alt_id)==FALSE]
@@ -55,22 +57,24 @@ find_related_domains <- function(domain,
         temp_domains_pre <- unique(temp_domains_post)
         
         # extract all id of given type present in subset
-        temp_alt <- id_df %>% 
-          filter(is.element(el = domain, set = temp_domains_pre)) %>% 
-          select(domain, i) %>% 
-          unnest() %>% 
-          pull(i) %>%
-          unique()
+        temp_alt <- identifiers_df %>% 
+          dplyr::filter(is.element(el = domain, set = temp_domains_pre)) %>% 
+          dplyr::select(domain, i) %>% 
+          tidyr::unnest() %>% 
+          dplyr::pull(i) %>%
+          base::unique()
         
         temp_alt <- temp_alt[temp_alt!=""]
         
         if (length(temp_alt)>0) {
-          temp_id_df  <- id_df %>% 
-            select(domain, i) %>% 
-            unnest()
+          temp_identifiers_df  <- identifiers_df %>% 
+            dplyr::select(domain, i) %>% 
+            tidyr::unnest()
           
-          temp_id_df <- temp_id_df[temp_id_df %>% pull(i) %in% temp_alt, 1:2]
-          temp_domains_post <- temp_id_df %>% distinct(domain) %>% pull(domain)
+          temp_identifiers_df <- temp_identifiers_df[temp_identifiers_df %>% dplyr::pull(i) %in% temp_alt, 1:2]
+          temp_domains_post <- temp_identifiers_df %>%
+            dplyr::distinct(domain) %>%
+            dplyr::pull(domain)
         } else {
           temp_domains_post <- temp_domains_pre
         }

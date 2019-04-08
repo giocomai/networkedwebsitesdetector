@@ -7,12 +7,8 @@
 \format{A character vector.}
 \usage{
 default_excluded_fb_app_id
-
-default_excluded_fb_app_id
 }
 \description{
-This includes ID such as "Facebook App ID here" or the default app id (966242223397117) left by lazy developers.
-
 This includes ID such as "Facebook App ID here" or the default app id (966242223397117) left by lazy developers.
 }
 \keyword{datasets}

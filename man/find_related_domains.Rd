@@ -4,11 +4,14 @@
 \alias{find_related_domains}
 \title{Get screenshots and place them in relevant subfolder}
 \usage{
-find_related_domains(domain, identifiers_df,
-  identifiers = default_identifiers, language = NULL)
+find_related_domains(domain,
+  identifiers_df = load_latest_identifiers_df(),
+  identifiers = default_identifiers, language = NULL, run_n = 3)
 }
 \arguments{
 \item{language}{A character vector of language two letter codes. Defaults to NULL. If NULL, processes available languages.}
+
+\item{run_n}{Number of times to go through all identifiers. For example, if a new domain is found within the network through a common fb_app_id, it may be useful to see if the new domain has any ca_pub codes with others.}
 }
 \value{
 Nothing, used for its side effects.
