@@ -60,3 +60,19 @@ check_if_exists <- function(domain,
     )
   }
 }
+
+#' Load latest identifiers_df
+#'
+#' @return A data.frame (a tibble), typically generated with `extract_identifiers()`
+#' @examples
+#' 
+#' @export
+#' 
+
+load_latest_identifiers_df <- function(language = NULL) {
+  if (is.null(language)==TRUE) {
+    language <- list.dirs(file.path("data", "identifiers"), recursive = FALSE, full.names = FALSE)
+  }
+  base_path <- file.path("data", "identifiers", language)
+  readRDS(file = fs::dir_ls(fs::dir_ls(path = base_path) %>% tail(1)))
+}

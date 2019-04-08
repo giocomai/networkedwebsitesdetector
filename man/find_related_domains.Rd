@@ -4,8 +4,8 @@
 \alias{find_related_domains}
 \title{Get screenshots and place them in relevant subfolder}
 \usage{
-find_related_domains(domain, identifiers_df, identifiers = c("ua",
-  "ca_pub", "fb_admins", "fb_page_id", "fb_app_id"), language = NULL)
+find_related_domains(domain, identifiers_df,
+  identifiers = default_identifiers, language = NULL)
 }
 \arguments{
 \item{language}{A character vector of language two letter codes. Defaults to NULL. If NULL, processes available languages.}
