@@ -1,4 +1,4 @@
-#' Get screenshots and place them in relevant subfolder
+#' Find domains related to each across key identifiers
 #'
 #' @param language A character vector of language two letter codes. Defaults to NULL. If NULL, processes available languages.
 #' @param run_n Number of times to go through all identifiers. For example, if a new domain is found within the network through a common fb_app_id, it may be useful to see if the new domain has any ca_pub codes with others. 
@@ -85,4 +85,23 @@ find_related_domains <- function(domain,
     
   }
   temp_domains
+}
+
+#' Add a network_id column to identifiers_df
+#'
+#' @return A data.frame (a tibble) including a network_id column grouping all domains that have elements in common.
+#' @examples
+#' 
+#' @export
+#' 
+add_network_id <- function(identifiers_df) {
+  identifiers_df$network_id <- NA
+  pb <- dplyr::progress_estimated(n = nrow(identifiers_df), min_time = 1)
+  for (i in 1:nrow(identifiers_df)) {
+    pb$tick()$print()
+    if (is.na(identifiers_df$network_id[identifiers_df$domain==identifiers_df$domain[i]])) {
+      related_domains <- find_related_domains(domain = identifiers_df$domain[i], identifiers_df = identifiers_df)
+      identifiers_df$network_id[identifiers_df$domain %in% related_domains] <- i
+    }
+  }
 }

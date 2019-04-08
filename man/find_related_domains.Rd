@@ -2,7 +2,7 @@
 % Please edit documentation in R/find_networks.R
 \name{find_related_domains}
 \alias{find_related_domains}
-\title{Get screenshots and place them in relevant subfolder}
+\title{Find domains related to each across key identifiers}
 \usage{
 find_related_domains(domain,
   identifiers_df = load_latest_identifiers_df(),
@@ -17,7 +17,7 @@ find_related_domains(domain,
 Nothing, used for its side effects.
 }
 \description{
-Get screenshots and place them in relevant subfolder
+Find domains related to each across key identifiers
 }
 \examples{
 
