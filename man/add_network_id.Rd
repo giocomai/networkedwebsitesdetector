@@ -4,7 +4,7 @@
 \alias{add_network_id}
 \title{Add a network_id column to identifiers_df}
 \usage{
-add_network_id(identifiers_df)
+add_network_id(identifiers_df, temporary_files = 100)
 }
 \value{
 A data.frame (a tibble) including a network_id column grouping all domains that have elements in common.

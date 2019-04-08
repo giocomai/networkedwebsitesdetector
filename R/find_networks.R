@@ -96,14 +96,28 @@ find_related_domains <- function(domain,
 #' 
 #' @export
 #' 
-add_network_id <- function(identifiers_df) {
+add_network_id <- function(identifiers_df,
+                           temporary_files = 100) {
   identifiers_df$network_id <- NA
+  if (is.null(temporary_files)==FALSE) {
+    store_when <- cumsum(rep(round(nrow(identifiers_df)/temporary_files), 100))
+  }
+  
+  fs::dir_create(path = file.path("data", "identifiers", "temp"), recursive = TRUE)
   pb <- dplyr::progress_estimated(n = nrow(identifiers_df), min_time = 1)
   for (i in 1:nrow(identifiers_df)) {
     pb$tick()$print()
     if (is.na(identifiers_df$network_id[identifiers_df$domain==identifiers_df$domain[i]])) {
       related_domains <- find_related_domains(domain = identifiers_df$domain[i], identifiers_df = identifiers_df)
       identifiers_df$network_id[identifiers_df$domain %in% related_domains] <- i
+      if (is.null(temporary_files)==FALSE) {
+        if (is.element(i, store_when)) {
+          saveRDS(object = identifiers_df,
+                  file = file.path("data", "identifiers", "temp", paste0("identifiers_df_network_id-", i, ".rds")))
+          message(paste("\nTemporary files stored after processing", i, "lines"))
+        }
+          
+      }
     }
   }
   return(identifiers_df)
