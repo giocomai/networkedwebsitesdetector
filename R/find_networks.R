@@ -9,7 +9,7 @@
 
 find_related_domains <- function(domain,
                                  identifiers_df,
-                                 identifiers = c("ua","ca_pub","fb_admins", "fb_page_id", "fb_app_id"),
+                                 identifiers = default_identifiers,
                                  language = NULL) {
   temp_domains <- domain
   
