@@ -11,12 +11,8 @@ get_screenshot <- function(domain, width = 1280, height = 1280, language = NULL,
   if (is.null(language)==TRUE) {
     language <- list.dirs(file.path("data", "domains", "homepage"), recursive = FALSE, full.names = FALSE)
   }
-  dir.create(path = "data", showWarnings = FALSE)
-  dir.create(path = file.path("data", "domains"), showWarnings = FALSE)
-  dir.create(path = file.path("data", "domains", "screenshots"), showWarnings = FALSE)
-  dir.create(path = file.path("data", "domains", "screenshots", language), showWarnings = FALSE)
-  dir.create(path = file.path("data", "domains", "screenshots_failed"), showWarnings = FALSE)
-  dir.create(path = file.path("data", "domains", "screenshots_failed", language), showWarnings = FALSE)
+  fs::dir_create(path = file.path("data", "domains", "screenshots", language), recursive = TRUE)
+  fs::dir_create(path = file.path("data", "domains", "screenshots_failed", language), recursive = TRUE)
   
   today_path <- file.path("data", "domains", "screenshots", language, Sys.Date())
   today_path_screenshots_failed <- file.path("data", "domains", "screenshots_failed", language, Sys.Date())
@@ -29,7 +25,7 @@ get_screenshot <- function(domain, width = 1280, height = 1280, language = NULL,
   pb <- dplyr::progress_estimated(length(domain))
   purrr::walk(.x = domain,
               .f =  function(x) {pb$tick()$print()
-                if (check_if_exists(domain = x, type = "screenshots")==FALSE) {
+                if (networkedwebsitesdetector::check_if_exists(domain = x, type = "screenshots")==FALSE) {
                   tryCatch({webshot::webshot(url = paste0("http://", x),
                                              file = file.path(today_path, paste0(x, ".png")),
                                              vwidth = width,

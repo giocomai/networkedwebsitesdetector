@@ -4,7 +4,7 @@
 \alias{get_homepage}
 \title{Download homepages by url in relevant sub-folder.}
 \usage{
-get_homepage(domain = NULL, language = NULL)
+get_homepage(domain = NULL, language = NULL, shuffle = TRUE)
 }
 \arguments{
 \item{domain}{A character vector of one or more domain names.}

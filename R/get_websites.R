@@ -9,13 +9,18 @@
 #' @export
 #' 
 
-get_homepage <- function(domain = NULL, language = NULL) {
+get_homepage <- function(domain = NULL,
+                         language = NULL,
+                         shuffle = TRUE) {
   if (is.null(language)==TRUE) {
     language <- list.dirs(file.path("data", "domains", "homepage"), recursive = FALSE, full.names = FALSE)
   }
-  dir.create(file.path("data", "domains"), showWarnings = FALSE)
-  dir.create(file.path("data", "domains", "homepage"), showWarnings = FALSE)
-  dir.create(file.path("data", "domains", "homepage_failed"), showWarnings = FALSE)
+  
+  today_path_homepage <- file.path("data", "domains", "homepage", language, Sys.Date())
+  today_path_homepage_failed <- file.path("data", "domains", "homepage_failed", language, Sys.Date())
+  
+  fs::dir_create(path = today_path_homepage, recursive = TRUE)
+  fs::dir_create(path = today_path_homepage_failed, recursive = TRUE)
   
   if (is.null(domain)) {
     all_domains <- readRDS(file = file.path("data", "domains", "domain_name", language, "all_domains.rds"))
@@ -23,26 +28,26 @@ get_homepage <- function(domain = NULL, language = NULL) {
     all_domains <- tibble::tibble(domain = domain)
   }
   
-  dir.create(file.path("data", "domains", "homepage", language), showWarnings = FALSE)
-  dir.create(file.path("data", "domains", "homepage_failed", language), showWarnings = FALSE)
-  today_path_homepage <- file.path("data", "domains", "homepage", language, Sys.Date())
-  dir.create(today_path_homepage, showWarnings = FALSE)
-  today_path_homepage_failed <- file.path("data", "domains", "homepage_failed", language, Sys.Date())
-  dir.create(today_path_homepage_failed, showWarnings = FALSE)
-  
-  for (j in sample(all_domains %>% dplyr::pull(domain))) {
-    filename <- file.path(today_path_homepage, paste0(j, ".html"))
-    if (file.exists(filename)==FALSE) {
-      if (file.exists(file.path(today_path_homepage_failed, paste0(j, ".txt")))==FALSE) {
-        tryCatch({download.file(url = j, destfile = filename)},
-                 error=function(e){
-                   
-                   readr::write_file(x = paste0("Could not download ", j),
-                                     path = file.path(today_path_homepage_failed, paste0(j, ".txt")))
-                   
-                   message(paste0("Could not download ", j, ": "),
-                           conditionMessage(e), "\n")})
-      }
-    }
+  if (shuffle == TRUE) {
+    domain <- sample(all_domains %>% dplyr::pull(domain))
+  } else {
+    domain <- all_domains %>% dplyr::pull(domain)
   }
+  
+  pb <- dplyr::progress_estimated(length(domain))
+  purrr::walk(.x = domain,
+              .f =  function(x) {pb$tick()$print()
+                if (networkedwebsitesdetector::check_if_exists(domain = x, type = "homepage")==FALSE) {
+                  tryCatch({download.file(url = x,
+                                          destfile = file.path(today_path_homepage, paste0(x, ".html")))},
+                           error=function(e){
+                             
+                             readr::write_file(x = paste0("Could not download ", x),
+                                               path = file.path(today_path_homepage_failed, paste0(x, ".txt")))
+                             
+                             message(paste0("Could not download ", x, ": "),
+                                     conditionMessage(e), "\n")})
+                }
+              }
+  )
 }
