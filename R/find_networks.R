@@ -65,6 +65,17 @@ find_related_domains <- function(domain,
             dplyr::pull(i) %>%
             base::unique()
           
+          ## clean up
+          if (i == "ua") {
+            temp_alt <- temp_alt_id[is.element(el = temp_alt_id, set = default_excluded_ua)==FALSE] 
+          }
+          if (i == "fb_admins") {
+            temp_alt <- temp_alt_id[is.element(el = temp_alt_id, set = default_excluded_fb_admins)==FALSE] 
+          }
+          if (i == "fb_app_id") {
+            temp_alt <- temp_alt_id[is.element(el = temp_alt_id, set = default_excluded_fb_app_id)==FALSE]
+          }
+          
           temp_alt <- temp_alt[temp_alt!=""&is.na(temp_alt)==FALSE]
           
           if (length(temp_alt)>0) {
