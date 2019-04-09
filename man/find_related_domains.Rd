@@ -4,8 +4,7 @@
 \alias{find_related_domains}
 \title{Find domains related to each across key identifiers}
 \usage{
-find_related_domains(domain,
-  identifiers_df = load_latest_identifiers_df(),
+find_related_domains(domain, identifiers_df = load_identifiers_df(),
   identifiers = default_identifiers, language = NULL, run_n = 3)
 }
 \arguments{

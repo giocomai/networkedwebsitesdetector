@@ -92,14 +92,27 @@ find_related_domains <- function(domain,
 
 #' Add a network_id column to identifiers_df
 #'
+#'
+#' @param identifiers_df A data frame, typically created with extract extract_identifiers() and loaded with load_identifiers_df().
 #' @return A data.frame (a tibble) including a network_id column grouping all domains that have elements in common.
 #' @examples
 #' 
 #' @export
 #' 
-add_network_id <- function(identifiers_df,
-                           temporary_files = NULL) {
-  identifiers_df$network_id <- NA
+add_network_id <- function(identifiers_df = load_identifiers_df(),
+                           temporary_files = NULL,
+                           continue_from_temporary = FALSE) {
+  if (continue_from_temporary==TRUE) {
+    temp_files <- fs::dir_ls(path = file.path("temp", "identifiers"))
+    identifiers_df <- readRDS(file = temp_files[temp_files %>% stringr::str_extract(pattern = "[[:digit:]]+.rds") %>% stringr::str_remove(pattern = stringr::fixed(".rds")) %>% as.integer() %>% which.max()])
+  }
+  
+  if (is.element(el = "network_id", set = colnames(identifiers_df))) {
+    # do nothing
+  } else {
+    identifiers_df$network_id <- NA
+  }
+
   if (is.null(temporary_files)==FALSE) {
     store_when <- cumsum(rep(round(nrow(identifiers_df)/temporary_files), 100))
   }
