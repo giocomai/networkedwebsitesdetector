@@ -9,7 +9,7 @@
 
 
 find_related_domains <- function(domain,
-                                 identifiers_df = load_latest_identifiers_df(),
+                                 identifiers_df = load_identifiers_df(),
                                  identifiers = default_identifiers,
                                  language = NULL,
                                  run_n = 3) {
@@ -22,16 +22,6 @@ find_related_domains <- function(domain,
     }
     temp <- identifiers_df %>% 
       dplyr::filter(is.element(el = identifiers_df$domain, set = temp_domains))
-    ## clean up
-    if (i == "ua") {
-      temp$ua[[1]][is.element(el = default_excluded_ua, set = temp$ua)] <- NA
-    }
-    if (i == "fb_admins") {
-      temp$fb_admins[[1]][is.element(el = default_excluded_fb_admins, set = temp$fb_admins)] <- NA
-    }
-    if (i == "fb_app_id") {
-      temp$fb_app_id[[1]][is.element(el = default_excluded_fb_app_id, set = temp$fb_app_id)] <- NA
-    }
     
     if (nrow(temp)==0) {
       stop(paste("Domain", domain, "not available in archive"))
@@ -42,6 +32,17 @@ find_related_domains <- function(domain,
       tidyr::unnest() %>% 
       dplyr::pull(i) %>%
       base::unique() 
+    
+    ## clean up
+    if (i == "ua") {
+      temp_alt_id <- temp_alt_id[is.element(el = temp_alt_id, set = default_excluded_ua)==FALSE] 
+    }
+    if (i == "fb_admins") {
+      temp_alt_id <- temp_alt_id[is.element(el = temp_alt_id, set = default_excluded_fb_admins)==FALSE] 
+    }
+    if (i == "fb_app_id") {
+      temp_alt_id <- temp_alt_id[is.element(el = temp_alt_id, set = default_excluded_fb_app_id)==FALSE]
+    }
     
     
     if (identical(x = "", y = temp_alt_id)) {
@@ -97,13 +98,13 @@ find_related_domains <- function(domain,
 #' @export
 #' 
 add_network_id <- function(identifiers_df,
-                           temporary_files = 100) {
+                           temporary_files = NULL) {
   identifiers_df$network_id <- NA
   if (is.null(temporary_files)==FALSE) {
     store_when <- cumsum(rep(round(nrow(identifiers_df)/temporary_files), 100))
   }
   
-  fs::dir_create(path = file.path("data", "identifiers", "temp"), recursive = TRUE)
+  fs::dir_create(path = file.path("temp", "identifiers"), recursive = TRUE)
   pb <- dplyr::progress_estimated(n = nrow(identifiers_df), min_time = 1)
   for (i in 1:nrow(identifiers_df)) {
     pb$tick()$print()
@@ -113,7 +114,7 @@ add_network_id <- function(identifiers_df,
       if (is.null(temporary_files)==FALSE) {
         if (is.element(i, store_when)) {
           saveRDS(object = identifiers_df,
-                  file = file.path("data", "identifiers", "temp", paste0("identifiers_df_network_id-", i, ".rds")))
+                  file = file.path("temp", "identifiers", paste0("identifiers_df_network_id-", i, ".rds")))
           message(paste("\nTemporary files stored after processing", i, "lines"))
         }
           

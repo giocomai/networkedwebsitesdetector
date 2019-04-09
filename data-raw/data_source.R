@@ -5,12 +5,16 @@ default_excluded_fb_admins <- c("YOUR USER ID",
 usethis::use_data(default_excluded_fb_admins, overwrite = TRUE)
 
 default_excluded_fb_app_id <- c("Facebook App ID here", 
-                                "966242223397117", #default app id
+                                "966242223397117", # default app id
                                 "249643311490") # used by all wordpress.com websites
 
 usethis::use_data(default_excluded_fb_app_id, overwrite = TRUE)
 
-default_excluded_ua <- c("UA-52447") #wordpress
+default_excluded_ua <- c("UA-52447", # wordpress
+                         "UA-1615344", # google news
+                         "UA-7870337", # weebly
+                         "UA-5354236" # over-blog
+                         ) 
 
 usethis::use_data(default_excluded_ua, overwrite = TRUE)
 
