@@ -53,7 +53,7 @@ check_if_exists <- function(domain,
   if (simplify==FALSE) {
     return(available_files)
   } else if (simplify==TRUE) {
-    if (sum(available_files$available, available_files$available)>0) {
+    if (sum(available_files$available, available_files$failed)>0) {
       return(TRUE)
     } else (
       return(FALSE)
