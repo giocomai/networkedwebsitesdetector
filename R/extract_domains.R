@@ -1,4 +1,4 @@
-#' Get screenshots and place them in relevant subfolder
+#' Extract domain names from tweets
 #'
 #' @param language A character vector of language two letter codes. Defaults to NULL. If NULL, processes available languages.
 #' @return Nothing, used for its side effects. 

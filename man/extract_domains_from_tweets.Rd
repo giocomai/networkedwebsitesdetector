@@ -2,7 +2,7 @@
 % Please edit documentation in R/extract_domains.R
 \name{extract_domains_from_tweets}
 \alias{extract_domains_from_tweets}
-\title{Get screenshots and place them in relevant subfolder}
+\title{Extract domain names from tweets}
 \usage{
 extract_domains_from_tweets(language = NULL)
 }
@@ -13,7 +13,7 @@ extract_domains_from_tweets(language = NULL)
 Nothing, used for its side effects.
 }
 \description{
-Get screenshots and place them in relevant subfolder
+Extract domain names from tweets
 }
 \examples{
 

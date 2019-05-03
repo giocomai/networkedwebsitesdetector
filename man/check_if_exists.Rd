@@ -13,7 +13,7 @@ check_if_exists(domain, type = "homepage", language = NULL,
 \item{type}{Type of file to check, defaults to "homepage". Alternative options: "screenshots".}
 }
 \value{
-Nothing, used for its side effects.
+If `simplify` is TRUE, it returns a logical vector of length 1, either TRUE or FALSE. If `simplify == FALSE`, it returns a data frame with details on the availability of files related to the given domain.
 }
 \description{
 Check if corresponding information for a given domain exists for a given data type and a given time period
