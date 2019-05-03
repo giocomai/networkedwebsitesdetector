@@ -24,7 +24,8 @@ extract_keywords <- function(languages = c("ar","bg","cs","da","de","el","en","e
     
     
     all_news <- suppressMessages(purrr::map_df(.x = all_rds,
-                                               .f = readr::read_rds)) #unisce i file in un singolo data frame
+                                               .f = readr::read_rds)) %>% #unisce i file in un singolo data frame
+      dplyr::distinct(link, .keep_all = TRUE)
     
     keywords <- all_news %>% 
       dplyr::transmute(title, Date = as.Date(pubDate)) %>%
