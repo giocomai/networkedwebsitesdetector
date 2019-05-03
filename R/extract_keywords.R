@@ -1,0 +1,52 @@
+#' Extract most frequently used words from news titles 
+#'
+#' @param language A character vector of language two letter codes. Defaults to NULL. If NULL, processes available languages.
+#' @param n An integer. Number of words to keep. 
+#' @param date Only news downloaded in the given date will be considered. Defaults to current day. To get data for the previous day, use `Sys.Date()-1` 
+#' @return Nothing, used for its side effects. 
+#' @examples
+#' 
+#' @export
+
+extract_keywords <- function(languages = c("ar","bg","cs","da","de","el","en","es", "et","fi","fr","hr", "hu","it", "lt","lv","nl","pl","pt","ro","ru", "sk","sl","sv","sw","tr","zh"),
+                             n = 10,
+                             date = Sys.Date(), 
+                             store = TRUE) {
+  
+  for (i in languages) {
+    all_rds <- list.files(path = file.path("emm_newsbrief_all",
+                                           i,
+                                           as.character(lubridate::year(date)),
+                                           as.character(lubridate::month(date)),
+                                           as.character(lubridate::day(date))),
+                          pattern = paste0(i, "\\.rds"),
+                          full.names = TRUE)  # elenca i file del giorno precedente
+    
+    
+    all_news <- suppressMessages(purrr::map_df(.x = all_rds,
+                                               .f = readr::read_rds)) #unisce i file in un singolo data frame
+    
+    keywords <- all_news %>% 
+      dplyr::transmute(title, Date = as.Date(pubDate)) %>%
+      tidytext::unnest_tokens(input = title, output = "words") %>% 
+      dplyr::anti_join(tibble::tibble(words = stopwords::stopwords(language = i, source = "stopwords-iso")), by = "words") %>% # elimina stopwords
+      dplyr::filter(!stringr::str_detect(string = words, pattern = "[[:digit:]]")) %>%  # togliere i numeri registrati come parole
+      dplyr::group_by(words) %>% 
+      dplyr::count(sort = TRUE) %>% 
+      head(n) %>% 
+      dplyr::pull(words)
+    
+    if (store==TRUE) {
+      keywords_base_path <- fs::path("keywords", 
+                                     i,
+                                     as.character(lubridate::year(date)),
+                                     as.character(lubridate::month(date)),
+                                     as.character(lubridate::day(date)))
+      
+      fs::dir_create(path = keywords_base_path)
+      saveRDS(object = keywords, file = fs::path(keywords_base_path, paste0(Sys.Date(), "-keywords_", i, ".rds")))
+    }
+  }
+  
+  keywords
+}

@@ -17,7 +17,11 @@ Imports:
     rvest,
     xml2,
     fs,
-    magrittr
+    magrittr,
+    rtweet,
+    longurl,
+    tidytext,
+    lubridate
 Remotes: 
     Thinkr-open/golem
 RoxygenNote: 6.1.1
