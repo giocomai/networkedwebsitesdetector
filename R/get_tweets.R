@@ -20,10 +20,10 @@ get_tweets <- function(keywords = NULL,
   
   if (is.null(keywords)) {
     keywords_day_folder <- fs::path("keywords", 
-                           language,
-                           as.character(lubridate::year(date)),
-                           as.character(lubridate::month(date)),
-                           as.character(lubridate::day(date)))
+                                    language,
+                                    as.character(lubridate::year(date)),
+                                    as.character(lubridate::month(date)),
+                                    as.character(lubridate::day(date)))
     keywords <- readRDS(fs::dir_ls(keywords_day_folder))
   }
   
@@ -32,19 +32,19 @@ get_tweets <- function(keywords = NULL,
   }
   
   tweets_day_folder <- fs::path("tweets", 
-                         language,
-                         as.character(lubridate::year(date)),
-                         as.character(lubridate::month(date)),
-                         as.character(lubridate::day(date)))
+                                language,
+                                as.character(lubridate::year(date)),
+                                as.character(lubridate::month(date)),
+                                as.character(lubridate::day(date)))
   
-  fs::dir_create(path = day_folder, recurse = TRUE)
+  fs::dir_create(path = tweets_day_folder, recurse = TRUE)
   
   for (i in keywords) {
-    tweets <- search_tweets(q = i,
-                            n = n_tweets,
-                            lang = language,
-                            include_rts = FALSE,
-                            type = "mixed")
+    tweets <- rtweet::search_tweets(q = i,
+                                    n = n_tweets,
+                                    lang = language,
+                                    include_rts = FALSE,
+                                    type = "mixed")
     
     saveRDS(object = tweets,
             file = fs::path(tweets_day_folder, paste0(i, "-", language, "-", Sys.time(), ".rds")))
