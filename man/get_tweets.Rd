@@ -5,7 +5,7 @@
 \title{Searches keywords on Twitter.}
 \usage{
 get_tweets(keywords = NULL, date = Sys.Date(), language,
-  n_tweets = 1000, wait = 10, store = TRUE)
+  n_tweets = 1000, tweet_type = "recent", wait = 10, store = TRUE)
 }
 \arguments{
 \item{keywords}{Defaults to NULL. If NULL, tries to import previously stored keywords for given language and date. If a data frame, it assumes that the first columns includes the keywords. If a character vector, it processes it directly.}
@@ -13,6 +13,8 @@ get_tweets(keywords = NULL, date = Sys.Date(), language,
 \item{date}{Used to find keywords locally, if none are provided. Defaults to current day. To get data for the previous day, use `Sys.Date()-1`}
 
 \item{n_tweets}{An integer. Number of tweets to request.}
+
+\item{tweet_type}{Passed to `rtweet`. Defaults to "recent". Other valid types include "mixed" and "popular".}
 }
 \value{
 A data.frame (a tibble) with `n` number of rows and two columns, `words` and `n` for number of occurrences.
