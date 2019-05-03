@@ -11,10 +11,6 @@
 
 get_emm_newsbrief <- function(languages = c("ar","bg","cs","da","de","el","en","es", "et","fi","fr","hr", "hu","it", "lt","lv","nl","pl","pt","ro","ru", "sk","sl","sv","sw","tr","zh"),
                               shuffle = TRUE) {
-  fs::dir_create(path = fs::path("emm_newsbrief_all", 
-                                 as.character(lubridate::year(Sys.Date())), 
-                                 as.character(lubridate::month(Sys.Date())), 
-                                 as.character(lubridate::day(Sys.Date()))), recurse = TRUE)
   
   if (shuffle==TRUE) {
     languages <- sample(languages)
@@ -22,10 +18,14 @@ get_emm_newsbrief <- function(languages = c("ar","bg","cs","da","de","el","en","
   
   for (i in languages) {
     
-    xml_location <- fs::path("emm_newsbrief_all",
-                             as.character(lubridate::year(Sys.Date())),
-                             as.character(lubridate::month(Sys.Date())),
-                             as.character(lubridate::day(Sys.Date())),
+    base_path <- fs::path("emm_newsbrief_all", 
+                          i,
+                          as.character(lubridate::year(Sys.Date())), 
+                          as.character(lubridate::month(Sys.Date())), 
+                          as.character(lubridate::day(Sys.Date())))
+    fs::dir_create(path = base_path, recurse = TRUE)
+    
+    xml_location <- fs::path(base_path,
                              paste0(Sys.time(), "-emm_rtn_", i, ".xml"))
     
     download.file(url = paste0("http://emm.newsbrief.eu/rss/rss?type=rtn&language=", i, "&duplicates=false"),
@@ -47,7 +47,7 @@ get_emm_newsbrief <- function(languages = c("ar","bg","cs","da","de","el","en","
                                entity = list(nrows_rss))
       
       for (i in 1:nrows_rss) {
-        temp <- xml2_list %>% extract2(i)
+        temp <- xml2_list %>% magrittr::extract2(i)
         
         rss_df$title[i] <- temp$title %>% as.character()
         rss_df$link[i] <- temp$link %>% as.character()
