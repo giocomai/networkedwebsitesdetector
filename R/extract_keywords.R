@@ -3,7 +3,7 @@
 #' @param language A character vector of language two letter codes. Defaults to NULL. If NULL, processes available languages.
 #' @param n An integer. Number of words to keep. 
 #' @param date Only news downloaded in the given date will be considered. Defaults to current day. To get data for the previous day, use `Sys.Date()-1` 
-#' @return Nothing, used for its side effects. 
+#' @return A data.frame (a tibble) with `n` number of rows and two columns, `words` and `n` for number of occurrences.
 #' @examples
 #' 
 #' @export
@@ -33,8 +33,7 @@ extract_keywords <- function(languages = c("ar","bg","cs","da","de","el","en","e
       dplyr::filter(!stringr::str_detect(string = words, pattern = "[[:digit:]]")) %>%  # togliere i numeri registrati come parole
       dplyr::group_by(words) %>% 
       dplyr::count(sort = TRUE) %>% 
-      head(n) %>% 
-      dplyr::pull(words)
+      head(n) 
     
     if (store==TRUE) {
       keywords_base_path <- fs::path("keywords", 

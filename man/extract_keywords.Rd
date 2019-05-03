@@ -17,7 +17,7 @@ extract_keywords(languages = c("ar", "bg", "cs", "da", "de", "el", "en",
 \item{language}{A character vector of language two letter codes. Defaults to NULL. If NULL, processes available languages.}
 }
 \value{
-Nothing, used for its side effects.
+A data.frame (a tibble) with `n` number of rows and two columns, `words` and `n` for number of occurrences.
 }
 \description{
 Extract most frequently used words from news titles
