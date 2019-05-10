@@ -18,7 +18,7 @@ nwd_get_emm_newsbrief <- function(languages = c("ar","bg","cs","da","de","el","e
   
   for (i in languages) {
     
-    base_path <- fs::path("emm_newsbrief_all", 
+    base_path <- fs::path("emm_newsbrief", 
                           i,
                           as.character(lubridate::year(Sys.Date())), 
                           stringr::str_pad(string = lubridate::month(Sys.Date()), width = 2), 
