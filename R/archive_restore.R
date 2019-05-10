@@ -161,7 +161,7 @@ nwd_download_from_googldrive <- function(date = Sys.Date(),
                                          filetype = "rds",
                                          overwrite = FALSE) {
   home_d <- googledrive::drive_ls() %>% dplyr::filter(name=="networkedwebsitesdetector")
-  language_folder_d <- googledrive::drive_ls(path = networkedwebsitesdetector_folder_d) %>% 
+  language_folder_d <- googledrive::drive_ls(path = home_d) %>% 
     dplyr::filter(name==language)
   
   all_types_folder_d <- googledrive::drive_ls(path = language_folder_d)
