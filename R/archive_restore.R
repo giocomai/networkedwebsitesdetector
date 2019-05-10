@@ -35,7 +35,7 @@ nwd_archive <- function(date = Sys.Date(),
                                               filetype,
                                               "_monthly.tar.gz"))
     tar(tarfile = archived_file_location,
-        files = fs::dir_ls(path =  fs::path(folder, year, stringr::str_pad(string = month, width = 2, pad = "0")),
+        files = fs::dir_ls(path =  fs::path(folder, language, year, stringr::str_pad(string = month, width = 2, pad = "0")),
                            recurse = TRUE,
                            type = "file",
                            glob = paste0("*", language, ".", filetype)),
