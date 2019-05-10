@@ -9,7 +9,7 @@
 #' 
 #' @export
 
-get_emm_newsbrief <- function(languages = c("ar","bg","cs","da","de","el","en","es", "et","fi","fr","hr", "hu","it", "lt","lv","nl","pl","pt","ro","ru", "sk","sl","sv","sw","tr","zh"),
+nwd_get_emm_newsbrief <- function(languages = c("ar","bg","cs","da","de","el","en","es", "et","fi","fr","hr", "hu","it", "lt","lv","nl","pl","pt","ro","ru", "sk","sl","sv","sw","tr","zh"),
                               shuffle = TRUE) {
   
   if (shuffle==TRUE) {
@@ -21,8 +21,8 @@ get_emm_newsbrief <- function(languages = c("ar","bg","cs","da","de","el","en","
     base_path <- fs::path("emm_newsbrief_all", 
                           i,
                           as.character(lubridate::year(Sys.Date())), 
-                          as.character(lubridate::month(Sys.Date())), 
-                          as.character(lubridate::day(Sys.Date())))
+                          stringr::str_pad(string = lubridate::month(Sys.Date()), width = 2), 
+                          stringr::str_pad(lubridate::day(Sys.Date())), width = 2)
     fs::dir_create(path = base_path, recurse = TRUE)
     
     xml_location <- fs::path(base_path,

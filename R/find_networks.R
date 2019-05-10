@@ -8,7 +8,7 @@
 #' @export
 
 
-find_related_domains <- function(domain,
+nwd_find_related_domains <- function(domain,
                                  identifiers_df = load_identifiers_df(),
                                  identifiers = default_identifiers,
                                  language = NULL,

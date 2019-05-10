@@ -8,9 +8,9 @@
 #' @export
 #' 
 
-extract_identifiers <- function(language = NULL,
-                                progress_bar = TRUE,
-                                sample = NULL) {
+nwd_extract_identifiers <- function(language = NULL,
+                                    progress_bar = TRUE,
+                                    sample = NULL) {
   if (is.null(language)==TRUE) {
     language <- list.dirs(file.path("data", "domains", "homepage"), recursive = FALSE, full.names = FALSE)
   }

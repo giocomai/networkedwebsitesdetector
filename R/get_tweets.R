@@ -12,20 +12,20 @@
 #' @export
 
 
-get_tweets <- function(keywords = NULL,
-                       date = Sys.Date(),
-                       language,
-                       n_tweets = 1000,
-                       tweet_type = "recent",
-                       wait = 10, 
-                       store = TRUE) {
+nwd_get_tweets <- function(keywords = NULL,
+                           date = Sys.Date(),
+                           language,
+                           n_tweets = 1000,
+                           tweet_type = "recent",
+                           wait = 10, 
+                           store = TRUE) {
   
   if (is.null(keywords)) {
     keywords_day_folder <- fs::path("keywords", 
                                     language,
                                     as.character(lubridate::year(date)),
-                                    as.character(lubridate::month(date)),
-                                    as.character(lubridate::day(date)))
+                                    stringr::str_pad(lubridate::month(date), width = 2),
+                                    stringr::str_pad(lubridate::day(date), width = 2))
     keywords <- readRDS(fs::dir_ls(keywords_day_folder))
   }
   
@@ -38,8 +38,8 @@ get_tweets <- function(keywords = NULL,
   tweets_day_folder <- fs::path("tweets", 
                                 language,
                                 as.character(lubridate::year(date)),
-                                as.character(lubridate::month(date)),
-                                as.character(lubridate::day(date)))
+                                stringr::str_pad(lubridate::month(date), width = 2),
+                                stringr::str_pad(lubridate::day(date), width = 2))
   
   fs::dir_create(path = tweets_day_folder, recurse = TRUE)
   
@@ -51,7 +51,8 @@ get_tweets <- function(keywords = NULL,
                                     type = tweet_type)
     
     saveRDS(object = tweets,
-            file = fs::path(tweets_day_folder, paste0(i, "-", language, "-", n_tweets, "-", tweet_type, "-", Sys.time(), ".rds")))
+            file = fs::path(tweets_day_folder, 
+                            paste0(i, "-", language, "-", n_tweets, "-", tweet_type, "-", Sys.time(), ".rds")))
     
     Sys.sleep(time = wait)
   }
