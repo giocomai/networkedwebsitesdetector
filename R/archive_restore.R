@@ -125,7 +125,7 @@ nwd_backup_to_googledrive <- function(date = Sys.Date(),
   
   if (nrow(year_folder_d)==0) {
     year_folder_d <- googledrive::drive_mkdir(name = as.character(year),
-                                              parent = as.character(year))
+                                              parent = type_folder_d)
   } else if (nrow(year_folder_d)==1) {
     # do nothing
   } else {
