@@ -8,19 +8,19 @@
 #' 
 #' @export
 
-extract_keywords <- function(languages = c("ar","bg","cs","da","de","el","en","es", "et","fi","fr","hr", "hu","it", "lt","lv","nl","pl","pt","ro","ru", "sk","sl","sv","sw","tr","zh"),
+nwd_extract_keywords <- function(languages = c("ar","bg","cs","da","de","el","en","es", "et","fi","fr","hr", "hu","it", "lt","lv","nl","pl","pt","ro","ru", "sk","sl","sv","sw","tr","zh"),
                              n = 10,
                              date = Sys.Date(), 
                              store = TRUE) {
   
   for (i in languages) {
-    all_rds <- list.files(path = file.path("emm_newsbrief_all",
+    all_rds <- list.files(path = file.path("emm_newsbrief",
                                            i,
                                            as.character(lubridate::year(date)),
-                                           as.character(lubridate::month(date)),
-                                           as.character(lubridate::day(date))),
+                                           stringr::str_pad(lubridate::month(date), width = 2),
+                                           stringr::str_pad(lubridate::day(date), width = 2)),
                           pattern = paste0(i, "\\.rds"),
-                          full.names = TRUE)  # elenca i file del giorno precedente
+                          full.names = TRUE)  
     
     
     all_news <- suppressMessages(purrr::map_df(.x = all_rds,
@@ -40,11 +40,13 @@ extract_keywords <- function(languages = c("ar","bg","cs","da","de","el","en","e
       keywords_base_path <- fs::path("keywords", 
                                      i,
                                      as.character(lubridate::year(date)),
-                                     as.character(lubridate::month(date)),
-                                     as.character(lubridate::day(date)))
+                                     stringr::str_pad(lubridate::month(date), width = 2),
+                                     stringr::str_pad(lubridate::day(date), width = 2))
       
       fs::dir_create(path = keywords_base_path)
-      saveRDS(object = keywords, file = fs::path(keywords_base_path, paste0(Sys.Date(), "-keywords_", i, ".rds")))
+      saveRDS(object = keywords,
+              file = fs::path(keywords_base_path,
+                              paste0(Sys.Date(), "-keywords_", i, ".rds")))
     }
   }
   
