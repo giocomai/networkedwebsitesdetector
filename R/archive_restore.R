@@ -112,7 +112,7 @@ nwd_backup_to_googledrive <- function(date = Sys.Date(),
     stop("networkedwebsitesdetector should find just one folder type with the same name. Please delete if you have more than one.")
   }
   
- 
+  
   year <- lubridate::year(Sys.Date())
   
   ## year folder
@@ -145,3 +145,51 @@ nwd_backup_to_googledrive <- function(date = Sys.Date(),
   
 }
 
+
+#' Download files archived in Google Drive
+#'
+#' @param language A character vector of language two letter codes. Defaults to NULL. If NULL, processes available languages.
+#' @return Nothing, used for its side effects. 
+#' @examples
+#' 
+#' @export
+
+nwd_download_from_googldrive <- function(date = Sys.Date(),
+                                         folder = "tweets",
+                                         timeframe = "monthly",
+                                         language = "it",
+                                         filetype = "rds",
+                                         overwrite = FALSE) {
+  home_d <- googledrive::drive_ls() %>% dplyr::filter(name=="networkedwebsitesdetector")
+  language_folder_d <- googledrive::drive_ls(path = networkedwebsitesdetector_folder_d) %>% 
+    dplyr::filter(name==language)
+  
+  all_types_folder_d <- googledrive::drive_ls(path = language_folder_d)
+  
+  type_folder_d <- all_types_folder_d %>%
+    dplyr::filter(name==folder)
+  
+  year <- lubridate::year(Sys.Date())
+  
+  ## year folder
+  
+  all_years_folder_d <- googledrive::drive_ls(path = type_folder_d)
+  
+  ## year folder
+  year_folder_d <- all_years_folder_d %>%
+    dplyr::filter(name==as.character(year))
+  
+  year_folder_contents_d <- googledrive::drive_ls(path = year_folder_d)
+  
+  base_year_path <- fs::path("archive", language, folder, year)
+  fs::dir_create(path = base_year_path, recurse = TRUE)
+  
+  for (i in 1:nrow(year_folder_contents_d)) {
+    temp_file_d <- year_folder_contents_d %>% dplyr::slice(i)
+    googledrive::drive_download(file = temp_file_d,
+                                path = fs::path(base_year_path, temp_file_d$name),
+                                overwrite = overwrite)
+    
+  }
+  
+}
