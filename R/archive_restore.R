@@ -184,8 +184,12 @@ nwd_download_from_googldrive <- function(date = Sys.Date(),
   base_year_path <- fs::path("archive", language, folder, year)
   fs::dir_create(path = base_year_path, recurse = TRUE)
   
-  for (i in 1:nrow(year_folder_contents_d)) {
-    temp_file_d <- year_folder_contents_d %>% dplyr::slice(i)
+  year_folder_contents_filtered_d <- year_folder_contents_d %>% 
+    dplyr::filter(stringr::str_detect(string = name,
+                                      pattern = paste0(filetype, "_", timeframe, ".tar.gz")))
+  
+  for (i in 1:nrow(year_folder_contents_filtered_d)) {
+    temp_file_d <- year_folder_contents_filtered_d %>% dplyr::slice(i)
     googledrive::drive_download(file = temp_file_d,
                                 path = fs::path(base_year_path, temp_file_d$name),
                                 overwrite = overwrite)
