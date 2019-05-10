@@ -46,7 +46,38 @@ nwd_archive <- function(date = Sys.Date(),
   archived_file_location
 }
 
+#' Restore data from compressed files
+#'
+#' @param language A character vector of language two letter codes. Defaults to NULL. If NULL, processes available languages.
+#' @return Nothing, used for its side effects. 
+#' @examples
+#' 
+#' @export
 
+nwd_restore <- function(date = Sys.Date(),
+                        folder = "tweets",
+                        timeframe = "monthly",
+                        language = "it",
+                        filetype = "rds") {
+  archived_files_location_l <- fs::dir_ls(path = fs::path("archive", language, folder, lubridate::year(date)),
+                                          recurse = FALSE,
+                                          type = "file",
+                                          glob = paste0("*_",
+                                                        language, 
+                                                        "_", 
+                                                        folder, 
+                                                        "_",
+                                                        filetype,
+                                                        "_", 
+                                                        timeframe, ".tar.gz"))
+  
+  
+  purrr::walk(.x = archived_files_location_l,
+              .f = function (x) {
+                untar(tarfile = x)
+              })
+  
+}
 
 #' Backup archived files to googledrive
 #'
@@ -196,4 +227,44 @@ nwd_download_from_googldrive <- function(date = Sys.Date(),
     
   }
   
+}
+
+#' Adjusts file names of folders with single digits
+#'
+#' @param language A character vector of language two letter codes. Defaults to NULL. If NULL, processes available languages.
+#' @return Nothing, used for its side effects. 
+#' @examples
+#' 
+#' @export
+
+nwd_adjust_folder_names <- function(folder = "tweets", language = NULL, date = NULL) {
+  if (is.null(date)) {
+    year <- lubridate::year(Sys.Date())
+  } else {
+    year <- lubridate::year(date)
+  }
+  
+  short_paths <- fs::dir_ls(path = fs::path(folder, year),
+                            recurse = TRUE,
+                            type = "directory")
+  
+  short_paths_split <- short_paths %>% 
+    fs::path_split()
+  
+  for (i in seq_along(short_paths_split)) {
+    short_paths_split[[i]][3] <- stringr::str_pad(string = short_paths_split[[i]][3],
+                                                  width = 2,
+                                                  pad = "0")
+    if (length(short_paths_split[[i]])==4) {
+      short_paths_split[[i]][4] <- stringr::str_pad(string = short_paths_split[[i]][4],
+                                                    width = 2,
+                                                    pad = "0")
+    }
+  }
+  
+  short_paths_joined <- fs::path_join(parts = short_paths_split)
+  
+  short_paths_l <- as.character(short_paths)!=short_paths_joined
+  
+  fs::file_move(path = short_paths[short_paths_l], new_path = short_paths_joined[short_paths_l])
 }

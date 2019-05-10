@@ -24,8 +24,8 @@ nwd_get_tweets <- function(keywords = NULL,
     keywords_day_folder <- fs::path("keywords", 
                                     language,
                                     as.character(lubridate::year(date)),
-                                    stringr::str_pad(lubridate::month(date), width = 2),
-                                    stringr::str_pad(lubridate::day(date), width = 2))
+                                    stringr::str_pad(lubridate::month(date), width = 2, pad = "0"),
+                                    stringr::str_pad(lubridate::day(date), width = 2, pad = "0"))
     keywords <- readRDS(fs::dir_ls(keywords_day_folder))
   }
   
@@ -38,8 +38,8 @@ nwd_get_tweets <- function(keywords = NULL,
   tweets_day_folder <- fs::path("tweets", 
                                 language,
                                 as.character(lubridate::year(date)),
-                                stringr::str_pad(lubridate::month(date), width = 2),
-                                stringr::str_pad(lubridate::day(date), width = 2))
+                                stringr::str_pad(lubridate::month(date), width = 2, pad = "0"),
+                                stringr::str_pad(lubridate::day(date), width = 2, pad = "0"))
   
   fs::dir_create(path = tweets_day_folder, recurse = TRUE)
   
