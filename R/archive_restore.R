@@ -56,7 +56,7 @@ nwd_archive <- function(date = Sys.Date(),
 #' 
 #' @export
 
-nwd_backup_to_googledrive <- function(date = NULL,
+nwd_backup_to_googledrive <- function(date = Sys.Date(),
                                       folder = "tweets",
                                       timeframe = "monthly",
                                       language = "it",
@@ -91,7 +91,7 @@ nwd_backup_to_googledrive <- function(date = NULL,
     dplyr::filter(name==language)
   if (nrow(language_folder_d)==0) {
     language_folder_d <- googledrive::drive_mkdir(name = language, parent = networkedwebsitesdetector_folder_d)
-  } else if (nrow(home_d)==1) {
+  } else if (nrow(language_folder_d)==1) {
     #do nothing
   } else {
     stop("networkedwebsitesdetector should find just one folder with the same language name. Please delete if you have more than one.")
@@ -112,13 +112,15 @@ nwd_backup_to_googledrive <- function(date = NULL,
     stop("networkedwebsitesdetector should find just one folder type with the same name. Please delete if you have more than one.")
   }
   
-  if (is.null(date)) {
-    year <- lubridate::year(Sys.Date())
-  }
-  
+ 
+  year <- lubridate::year(Sys.Date())
   
   ## year folder
-  year_folder_d <- type_folder_d %>%
+  
+  all_years_folder_d <- googledrive::drive_ls(path = type_folder_d)
+  
+  ## year folder
+  year_folder_d <- all_years_folder_d %>%
     dplyr::filter(name==as.character(year))
   
   if (nrow(year_folder_d)==0) {
