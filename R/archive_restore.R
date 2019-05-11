@@ -15,8 +15,8 @@ nwd_archive <- function(date = NULL,
   
   if (is.null(language)) {
     language <-  fs::dir_ls(path = fs::path(folder),
-                             recurse = FALSE,
-                             type = "directory") %>% 
+                            recurse = FALSE,
+                            type = "directory") %>% 
       fs::path_file()
   }
   
@@ -148,74 +148,76 @@ nwd_backup_to_googledrive <- function(date = NULL,
         stringr::str_extract(pattern = "[[:digit:]][[:digit:]][[:digit:]][[:digit:]]-[[:digit:]][[:digit:]]-[[:digit:]][[:digit:]]") %>% 
         as.Date()
     }
-  
-  file_locations_to_upload <- fs::dir_ls(path = fs::path("archive", i, folder), recurse = TRUE, type = "file", glob = paste0("*_", filetype, "_", timeframe, ".tar.gz")) 
-  filenames_to_upload <- fs::path_file(path = file_locations_to_upload)
-  
-  ## base networkedwebsitesdetector folder
-  home_d <- googledrive::drive_ls() %>% dplyr::filter(name=="networkedwebsitesdetector")
-  if (nrow(home_d)==0) {
-    networkedwebsitesdetector_folder_d <- googledrive::drive_mkdir(name = "networkedwebsitesdetector")
-  } else if (nrow(home_d)==1) {
-    networkedwebsitesdetector_folder_d <- home_d
-  } else {
-    stop("networkedwebsitesdetector should find just one networkedwebsitesdetector folder. Please delete if you have more than one.")
-  }
-  
-  # language folders
-  language_folder_d <- googledrive::drive_ls(path = networkedwebsitesdetector_folder_d) %>% 
-    dplyr::filter(name==language)
-  if (nrow(language_folder_d)==0) {
-    language_folder_d <- googledrive::drive_mkdir(name = language, parent = networkedwebsitesdetector_folder_d)
-  } else if (nrow(language_folder_d)==1) {
-    #do nothing
-  } else {
-    stop("networkedwebsitesdetector should find just one folder with the same language name. Please delete if you have more than one.")
-  }
-  
-  all_types_folder_d <- googledrive::drive_ls(path = language_folder_d)
-  
-  ## type folder
-  type_folder_d <- all_types_folder_d %>%
-    dplyr::filter(name==folder)
-  
-  if (nrow(type_folder_d)==0) {
-    type_folder_d <- googledrive::drive_mkdir(name = folder,
-                                              parent = language_folder_d)
-  } else if (nrow(type_folder_d)==1) {
-    # do nothing
-  } else {
-    stop("networkedwebsitesdetector should find just one folder type with the same name. Please delete if you have more than one.")
-  }
-  
-  ## year folder
-  all_years_folder_d <- googledrive::drive_ls(path = type_folder_d, recursive = FALSE)
-  
-  years <- unique(lubridate::year(date))
-  
-  for (j in years) {
-    ## year folder
-    year_folder_d <- all_years_folder_d %>%
-      dplyr::filter(name==as.character(j))
-    if (nrow(year_folder_d)==0) {
-      year_folder_d <- googledrive::drive_mkdir(name = as.character(j),
-                                                parent = type_folder_d)
-    } else if (nrow(year_folder_d)==1) {
+    
+    file_locations_to_upload <- fs::dir_ls(path = fs::path("archive", i, folder), recurse = TRUE, type = "file", glob = paste0("*_", filetype, "_", timeframe, ".tar.gz")) 
+    filenames_to_upload <- fs::path_file(path = file_locations_to_upload)
+    
+    ## base networkedwebsitesdetector folder
+    home_d <- googledrive::drive_ls() %>% dplyr::filter(name=="networkedwebsitesdetector")
+    if (nrow(home_d)==0) {
+      networkedwebsitesdetector_folder_d <- googledrive::drive_mkdir(name = "networkedwebsitesdetector")
+    } else if (nrow(home_d)==1) {
+      networkedwebsitesdetector_folder_d <- home_d
+    } else {
+      stop("networkedwebsitesdetector should find just one networkedwebsitesdetector folder. Please delete if you have more than one.")
+    }
+    
+    # language folders
+    language_folder_d <- googledrive::drive_ls(path = networkedwebsitesdetector_folder_d) %>% 
+      dplyr::filter(name==language)
+    if (nrow(language_folder_d)==0) {
+      language_folder_d <- googledrive::drive_mkdir(name = language, parent = networkedwebsitesdetector_folder_d)
+    } else if (nrow(language_folder_d)==1) {
+      #do nothing
+    } else {
+      stop("networkedwebsitesdetector should find just one folder with the same language name. Please delete if you have more than one.")
+    }
+    
+    all_types_folder_d <- googledrive::drive_ls(path = language_folder_d)
+    
+    ## type folder
+    type_folder_d <- all_types_folder_d %>%
+      dplyr::filter(name==folder)
+    
+    if (nrow(type_folder_d)==0) {
+      type_folder_d <- googledrive::drive_mkdir(name = folder,
+                                                parent = language_folder_d)
+    } else if (nrow(type_folder_d)==1) {
       # do nothing
     } else {
-      stop("networkedwebsitesdetector should find just one folder type with the same year Please delete if you have more than one.")
+      stop("networkedwebsitesdetector should find just one folder type with the same name. Please delete if you have more than one.")
     }
-    year_folder_contents_d <- googledrive::drive_ls(path = year_folder_d)
     
-    if(nrow(year_folder_contents_d)==0) {
+    ## year folder
+    all_years_folder_d <- googledrive::drive_ls(path = type_folder_d, recursive = FALSE)
+    
+    years <- unique(lubridate::year(date))
+    
+    for (j in years) {
+      ## year folder
+      year_folder_d <- all_years_folder_d %>%
+        dplyr::filter(name==as.character(j))
+      if (nrow(year_folder_d)==0) {
+        year_folder_d <- googledrive::drive_mkdir(name = as.character(j),
+                                                  parent = type_folder_d)
+      } else if (nrow(year_folder_d)==1) {
+        # do nothing
+      } else {
+        stop("networkedwebsitesdetector should find just one folder type with the same year Please delete if you have more than one.")
+      }
+      year_folder_contents_d <- googledrive::drive_ls(path = year_folder_d)
+      
       current_year_logical <- stringr::str_starts(string = fs::path_file(file_locations_to_upload), pattern = as.character(j))
-      purrr::walk(.x = file_locations_to_upload[current_year_logical],
-                  .f = function(x) googledrive::drive_upload(media = x, path = year_folder_d))
-    } else {
-      purrr::walk(.x = file_locations_to_upload[current_year_logical][is.element(el = year_folder_contents_d$name, set = fs::path_file(file_locations_to_upload)[current_year_logical])==FALSE],
-                  .f = function(x) googledrive::drive_upload(media = x, path = year_folder_d))
+      
+      if(nrow(year_folder_contents_d)==0) {
+        purrr::walk(.x = file_locations_to_upload[current_year_logical],
+                    .f = function(x) googledrive::drive_upload(media = x, path = year_folder_d))
+      } else {
+        file_locations_to_upload_current_year <- file_locations_to_upload[current_year_logical]
+        purrr::walk(.x = file_locations_to_upload_current_year[is.element(el = fs::path_file(file_locations_to_upload_current_year), set = year_folder_contents_d$name)==FALSE],
+                    .f = function(x) googledrive::drive_upload(media = x, path = year_folder_d))
+      }
     }
-  }
   }
 }
 
@@ -259,7 +261,7 @@ nwd_download_from_googldrive <- function(date = NULL,
     years <- all_years_folder_d$name
     
     for (j in years) {
-
+      
       year_folder_d <- all_years_folder_d %>%
         dplyr::filter(name==as.character(j))
       
@@ -279,7 +281,7 @@ nwd_download_from_googldrive <- function(date = NULL,
         year_folder_contents_filtered_d  <- year_folder_contents_filtered_d %>% 
           dplyr::filter(is.element(name, local_files)==FALSE)
       }
-
+      
       for (k in 1:nrow(year_folder_contents_filtered_d)) {
         temp_file_d <- year_folder_contents_filtered_d %>% dplyr::slice(k)
         googledrive::drive_download(file = temp_file_d,
