@@ -14,15 +14,12 @@ nwd_extract_keywords <- function(languages = c("ar","bg","cs","da","de","el","en
                              store = TRUE) {
   
   for (i in languages) {
-    all_rds <- list.files(path = file.path("emm_newsbrief",
+    all_rds <- list.files(path = fs::path("emm_newsbrief",
                                            i,
-                                           as.character(lubridate::year(date)),
-                                           stringr::str_pad(lubridate::month(date), width = 2),
-                                           stringr::str_pad(lubridate::day(date), width = 2)),
+                                           as.character(date)),
                           pattern = paste0(i, "\\.rds"),
                           full.names = TRUE)  
-    
-    
+
     all_news <- suppressMessages(purrr::map_df(.x = all_rds,
                                                .f = readr::read_rds)) %>% #unisce i file in un singolo data frame
       dplyr::distinct(link, .keep_all = TRUE)
@@ -39,14 +36,12 @@ nwd_extract_keywords <- function(languages = c("ar","bg","cs","da","de","el","en
     if (store==TRUE) {
       keywords_base_path <- fs::path("keywords", 
                                      i,
-                                     as.character(lubridate::year(date)),
-                                     stringr::str_pad(lubridate::month(date), width = 2),
-                                     stringr::str_pad(lubridate::day(date), width = 2))
+                                     as.character(date))
       
       fs::dir_create(path = keywords_base_path)
       saveRDS(object = keywords,
               file = fs::path(keywords_base_path,
-                              paste0(Sys.Date(), "-keywords_", i, ".rds")))
+                              paste0(date, "-keywords_", i, ".rds")))
     }
   }
   
