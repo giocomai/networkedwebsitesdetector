@@ -4,8 +4,8 @@
 \alias{nwd_download_from_googldrive}
 \title{Download files archived in Google Drive}
 \usage{
-nwd_download_from_googldrive(date = Sys.Date(), folder = "tweets",
-  timeframe = "monthly", language = "it", filetype = "rds",
+nwd_download_from_googldrive(date = NULL, folder = "tweets",
+  timeframe = "daily", language = NULL, filetype = "rds",
   overwrite = FALSE)
 }
 \arguments{

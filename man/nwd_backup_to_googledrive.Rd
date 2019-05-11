@@ -4,8 +4,8 @@
 \alias{nwd_backup_to_googledrive}
 \title{Backup archived files to googledrive}
 \usage{
-nwd_backup_to_googledrive(date = Sys.Date(), folder = "tweets",
-  timeframe = "monthly", language = "it", filetype = "rds",
+nwd_backup_to_googledrive(date = NULL, folder = "tweets",
+  timeframe = "daily", language = NULL, filetype = "rds",
   show_filenames_only = FALSE)
 }
 \arguments{

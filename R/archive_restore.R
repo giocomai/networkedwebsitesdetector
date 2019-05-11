@@ -127,24 +127,29 @@ nwd_restore <- function(date = Sys.Date(),
 #' 
 #' @export
 
-nwd_backup_to_googledrive <- function(date = Sys.Date(),
+nwd_backup_to_googledrive <- function(date = NULL,
                                       folder = "tweets",
-                                      timeframe = "monthly",
-                                      language = "it",
+                                      timeframe = "daily",
+                                      language = NULL,
                                       filetype = "rds",
                                       show_filenames_only = FALSE) {
   
-  file_locations_to_upload <- fs::dir_ls(path = fs::path("archive", language, folder, lubridate::year(date)),
-                                         recurse = FALSE,
-                                         type = "file",
-                                         glob = paste0("*_",
-                                                       language, 
-                                                       "_", 
-                                                       folder, 
-                                                       "_",
-                                                       filetype,
-                                                       "_", 
-                                                       timeframe, ".tar.gz"))
+  if (is.null(language)) {
+    language <-  fs::dir_ls(path = fs::path("archive"),
+                            recurse = FALSE,
+                            type = "directory") %>% 
+      fs::path_file()
+  }
+  
+  for (i in language) {
+    if (is.null(date)) {
+      date <- fs::dir_ls(path = fs::path("archive", i, folder), recurse = TRUE, type = "file", glob = paste0("*_", filetype, "_", timeframe, ".tar.gz")) %>% 
+        fs::path_file() %>% 
+        stringr::str_extract(pattern = "[[:digit:]][[:digit:]][[:digit:]][[:digit:]]-[[:digit:]][[:digit:]]-[[:digit:]][[:digit:]]") %>% 
+        as.Date()
+    }
+  
+  file_locations_to_upload <- fs::dir_ls(path = fs::path("archive", i, folder), recurse = TRUE, type = "file", glob = paste0("*_", filetype, "_", timeframe, ".tar.gz")) 
   filenames_to_upload <- fs::path_file(path = file_locations_to_upload)
   
   ## base networkedwebsitesdetector folder
@@ -183,37 +188,35 @@ nwd_backup_to_googledrive <- function(date = Sys.Date(),
     stop("networkedwebsitesdetector should find just one folder type with the same name. Please delete if you have more than one.")
   }
   
-  
-  year <- lubridate::year(Sys.Date())
-  
   ## year folder
+  all_years_folder_d <- googledrive::drive_ls(path = type_folder_d, recursive = FALSE)
   
-  all_years_folder_d <- googledrive::drive_ls(path = type_folder_d)
+  years <- unique(lubridate::year(date))
   
-  ## year folder
-  year_folder_d <- all_years_folder_d %>%
-    dplyr::filter(name==as.character(year))
-  
-  if (nrow(year_folder_d)==0) {
-    year_folder_d <- googledrive::drive_mkdir(name = as.character(year),
-                                              parent = type_folder_d)
-  } else if (nrow(year_folder_d)==1) {
-    # do nothing
-  } else {
-    stop("networkedwebsitesdetector should find just one folder type with the same year Please delete if you have more than one.")
+  for (j in years) {
+    ## year folder
+    year_folder_d <- all_years_folder_d %>%
+      dplyr::filter(name==as.character(j))
+    if (nrow(year_folder_d)==0) {
+      year_folder_d <- googledrive::drive_mkdir(name = as.character(j),
+                                                parent = type_folder_d)
+    } else if (nrow(year_folder_d)==1) {
+      # do nothing
+    } else {
+      stop("networkedwebsitesdetector should find just one folder type with the same year Please delete if you have more than one.")
+    }
+    year_folder_contents_d <- googledrive::drive_ls(path = year_folder_d)
+    
+    if(nrow(year_folder_contents_d)==0) {
+      current_year_logical <- stringr::str_starts(string = fs::path_file(file_locations_to_upload), pattern = as.character(j))
+      purrr::walk(.x = file_locations_to_upload[current_year_logical],
+                  .f = function(x) googledrive::drive_upload(media = x, path = year_folder_d))
+    } else {
+      purrr::walk(.x = file_locations_to_upload[current_year_logical][is.element(el = year_folder_contents_d$name, set = fs::path_file(file_locations_to_upload)[current_year_logical])==FALSE],
+                  .f = function(x) googledrive::drive_upload(media = x, path = year_folder_d))
+    }
   }
-  
-  year_folder_contents_d <- googledrive::drive_ls(path = year_folder_d)
-  
-  
-  if(nrow(year_folder_contents_d)==0) {
-    purrr::walk(.x = file_locations_to_upload,
-                .f = function(x) googledrive::drive_upload(media = x, path = year_folder_d))
-  } else {
-    purrr::walk(.x = file_locations_to_upload[is.element(el = year_folder_contents_d$name, set = fs::path_file(file_locations_to_upload))==FALSE],
-                .f = function(x) googledrive::drive_upload(media = x, path = year_folder_d))
   }
-  
 }
 
 
@@ -225,47 +228,68 @@ nwd_backup_to_googledrive <- function(date = Sys.Date(),
 #' 
 #' @export
 
-nwd_download_from_googldrive <- function(date = Sys.Date(),
+nwd_download_from_googldrive <- function(date = NULL,
                                          folder = "tweets",
-                                         timeframe = "monthly",
-                                         language = "it",
+                                         timeframe = "daily",
+                                         language = NULL,
                                          filetype = "rds",
                                          overwrite = FALSE) {
   home_d <- googledrive::drive_ls() %>% dplyr::filter(name=="networkedwebsitesdetector")
-  language_folder_d <- googledrive::drive_ls(path = home_d) %>% 
-    dplyr::filter(name==language)
   
-  all_types_folder_d <- googledrive::drive_ls(path = language_folder_d)
+  all_languages_folder <- googledrive::drive_ls(path = home_d)
   
-  type_folder_d <- all_types_folder_d %>%
-    dplyr::filter(name==folder)
-  
-  year <- lubridate::year(Sys.Date())
-  
-  ## year folder
-  
-  all_years_folder_d <- googledrive::drive_ls(path = type_folder_d)
-  
-  ## year folder
-  year_folder_d <- all_years_folder_d %>%
-    dplyr::filter(name==as.character(year))
-  
-  year_folder_contents_d <- googledrive::drive_ls(path = year_folder_d)
-  
-  base_year_path <- fs::path("archive", language, folder, year)
-  fs::dir_create(path = base_year_path, recurse = TRUE)
-  
-  year_folder_contents_filtered_d <- year_folder_contents_d %>% 
-    dplyr::filter(stringr::str_detect(string = name,
-                                      pattern = paste0(filetype, "_", timeframe, ".tar.gz")))
-  
-  for (i in 1:nrow(year_folder_contents_filtered_d)) {
-    temp_file_d <- year_folder_contents_filtered_d %>% dplyr::slice(i)
-    googledrive::drive_download(file = temp_file_d,
-                                path = fs::path(base_year_path, temp_file_d$name),
-                                overwrite = overwrite)
-    
+  if (is.null(language)==TRUE) {
+    language <- all_languages_folder$name
   }
+  
+  for (i in language) {
+    
+    language_folder_d <-  all_languages_folder%>% 
+      dplyr::filter(name==i)
+    
+    all_types_folder_d <- googledrive::drive_ls(path = language_folder_d)
+    
+    type_folder_d <- all_types_folder_d %>%
+      dplyr::filter(name==folder)
+    
+    ## year folder
+    
+    all_years_folder_d <- googledrive::drive_ls(path = type_folder_d)
+    
+    years <- all_years_folder_d$name
+    
+    for (j in years) {
+
+      year_folder_d <- all_years_folder_d %>%
+        dplyr::filter(name==as.character(j))
+      
+      year_folder_contents_d <- googledrive::drive_ls(path = year_folder_d)
+      
+      base_year_path <- fs::path("archive", i, folder, j)
+      
+      fs::dir_create(path = base_year_path, recurse = TRUE)
+      
+      local_files <- fs::dir_ls(base_year_path) %>% fs::path_file()
+      
+      year_folder_contents_filtered_d <- year_folder_contents_d %>% 
+        dplyr::filter(stringr::str_detect(string = name,
+                                          pattern = paste0(filetype, "_", timeframe, ".tar.gz")))
+      
+      if (overwrite==FALSE) {
+        year_folder_contents_filtered_d  <- year_folder_contents_filtered_d %>% 
+          dplyr::filter(is.element(name, local_files)==FALSE)
+      }
+
+      for (k in 1:nrow(year_folder_contents_filtered_d)) {
+        temp_file_d <- year_folder_contents_filtered_d %>% dplyr::slice(k)
+        googledrive::drive_download(file = temp_file_d,
+                                    path = fs::path(base_year_path, temp_file_d$name),
+                                    overwrite = overwrite)
+        
+      }
+    }
+  }
+  
   
 }
 
