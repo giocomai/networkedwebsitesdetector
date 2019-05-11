@@ -4,10 +4,8 @@
 \alias{nwd_extract_keywords}
 \title{Extract most frequently used words from news titles}
 \usage{
-nwd_extract_keywords(languages = c("ar", "bg", "cs", "da", "de", "el",
-  "en", "es", "et", "fi", "fr", "hr", "hu", "it", "lt", "lv", "nl", "pl",
-  "pt", "ro", "ru", "sk", "sl", "sv", "sw", "tr", "zh"), n = 10,
-  date = Sys.Date(), store = TRUE)
+nwd_extract_keywords(languages = NULL, n = 20, date = NULL,
+  store = TRUE)
 }
 \arguments{
 \item{n}{An integer. Number of words to keep.}
