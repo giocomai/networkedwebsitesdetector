@@ -26,7 +26,6 @@ nwd_extract_keywords <- function(languages = NULL,
     if (is.null(date)) {
       date <- fs::dir_ls(path = fs::path("emm_newsbrief", i), recurse = FALSE, type = "directory") %>% 
         fs::path_file()
-      
     }
     
     for (j in date) {

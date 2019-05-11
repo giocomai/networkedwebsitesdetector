@@ -19,21 +19,21 @@ NULL
 #' @export
 #' 
 
-check_if_exists <- function(domain,
-                            type = "homepage",
-                            language = NULL,
-                            since = Sys.Date()-31,
-                            simplify = TRUE) {
-    
+nwd_check_if_exists <- function(domain,
+                                type = "homepage",
+                                language = NULL,
+                                since = Sys.Date()-91,
+                                simplify = TRUE) {
+  
   if (is.null(language)==TRUE) {
-    language <- list.dirs(file.path("data", "domains", "homepage"), recursive = FALSE, full.names = FALSE)
+    language <- list.dirs(file.path("homepage"), recursive = FALSE, full.names = FALSE)
     if (length(language)!=1) {
       stop("More than one language found. Please select one language.")
     }
   }
   
-  base_path <- file.path("data", "domains", type, language)
-  base_path_failed <- file.path("data", "domains", paste0(type, "_failed"), language)
+  base_path <- file.path(type, language)
+  base_path_failed <- file.path(paste0(type, "_failed"), language)
   
   available_files <- fs::dir_info(path = c(base_path, base_path_failed),
                                   recursive = FALSE,
@@ -69,11 +69,11 @@ check_if_exists <- function(domain,
 #' @export
 #' 
 
-load_latest_identifiers_df <- function(language = NULL) {
+nwd_load_latest_identifiers_df <- function(language = NULL) {
   if (is.null(language)==TRUE) {
-    language <- list.dirs(file.path("data", "identifiers"), recursive = FALSE, full.names = FALSE)
+    language <- list.dirs(file.path("identifiers"), recursive = FALSE, full.names = FALSE)
   }
-  base_path <- file.path("data", "identifiers", language)
+  base_path <- file.path("identifiers", language)
   readRDS(file = fs::dir_ls(fs::dir_ls(path = base_path) %>% tail(1)))
 }
 
@@ -84,11 +84,11 @@ load_latest_identifiers_df <- function(language = NULL) {
 #' 
 #' @export
 #' 
-load_identifiers_df <- function(language = NULL) {
+nwd_load_identifiers_df <- function(language = NULL) {
   if (is.null(language)==TRUE) {
-    language <- list.dirs(file.path("data", "identifiers"), recursive = FALSE, full.names = FALSE)
+    language <- list.dirs(file.path("identifiers"), recursive = FALSE, full.names = FALSE)
   }
-  base_path <- file.path("data", "identifiers", language)
+  base_path <- file.path("identifiers", language)
   purrr::map_dfr(.x = fs::dir_ls(fs::dir_ls(path = base_path)), .f = readRDS)
 }
 
@@ -103,14 +103,14 @@ load_identifiers_df <- function(language = NULL) {
 #' @export
 #' 
 
-clean_files <- function(min_size = 0,
-                        max_size = 1e8,
-                        remove_exceeding = FALSE,
-                        language = NULL) {
+nwd_clean_files <- function(min_size = 0,
+                            max_size = 1e8,
+                            remove_exceeding = FALSE,
+                            language = NULL) {
   if (is.null(language)==TRUE) {
-    language <- list.dirs(file.path("data", "domains", "homepage"), recursive = FALSE, full.names = FALSE)
+    language <- list.dirs(file.path("homepage"), recursive = FALSE, full.names = FALSE)
   }
-  file_info <- fs::dir_info(path = file.path("data", "domains", "homepage", language), recursive = TRUE, type = "file")
+  file_info <- fs::dir_info(path = file.path("homepage", language), recursive = TRUE, type = "file")
   
   file_exceeding <- file_info %>%
     dplyr::filter(size <= fs::as_fs_bytes(x = min_size) | size > fs::as_fs_bytes(x = max_size))

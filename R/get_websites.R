@@ -9,15 +9,15 @@
 #' @export
 #' 
 
-get_homepage <- function(domain = NULL,
-                         language = NULL,
-                         shuffle = TRUE) {
+nwd_get_homepage <- function(domain = NULL,
+                             language = NULL,
+                             shuffle = TRUE) {
   if (is.null(language)==TRUE) {
-    language <- list.dirs(file.path("data", "domains", "homepage"), recursive = FALSE, full.names = FALSE)
+    language <- list.dirs(file.path("homepage"), recursive = FALSE, full.names = FALSE)
   }
   
-  today_path_homepage <- file.path("data", "domains", "homepage", language, Sys.Date())
-  today_path_homepage_failed <- file.path("data", "domains", "homepage_failed", language, Sys.Date())
+  today_path_homepage <- file.path("homepage", language, Sys.Date())
+  today_path_homepage_failed <- file.path("homepage_failed", language, Sys.Date())
   
   fs::dir_create(path = today_path_homepage, recursive = TRUE)
   fs::dir_create(path = today_path_homepage_failed, recursive = TRUE)
@@ -37,7 +37,7 @@ get_homepage <- function(domain = NULL,
   pb <- dplyr::progress_estimated(length(domain))
   purrr::walk(.x = domain,
               .f =  function(x) {pb$tick()$print()
-                if (networkedwebsitesdetector::check_if_exists(domain = x, type = "homepage")==FALSE) {
+                if (networkedwebsitesdetector::nwd_check_if_exists(domain = x, type = "homepage")==FALSE) {
                   tryCatch({download.file(url = x,
                                           destfile = file.path(today_path_homepage, paste0(x, ".html")))},
                            error=function(e){
