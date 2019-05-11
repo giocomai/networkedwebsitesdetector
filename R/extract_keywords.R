@@ -35,35 +35,32 @@ nwd_extract_keywords <- function(languages = NULL,
                                             as.character(j)),
                             pattern = paste0(i, "\\.rds"),
                             full.names = TRUE)  
-      
-      all_news <- suppressMessages(purrr::map_df(.x = all_rds,
-                                                 .f = readr::read_rds)) %>% #unisce i file in un singolo data frame
-        dplyr::distinct(link, .keep_all = TRUE)
-      
-      keywords <- all_news %>% 
-        dplyr::transmute(title, Date = as.Date(pubDate)) %>%
-        tidytext::unnest_tokens(input = title, output = "words") %>% 
-        dplyr::anti_join(tibble::tibble(words = stopwords::stopwords(language = i, source = "stopwords-iso")), by = "words") %>% # elimina stopwords
-        dplyr::filter(!stringr::str_detect(string = words, pattern = "[[:digit:]]")) %>%  # togliere i numeri registrati come parole
-        dplyr::group_by(words) %>% 
-        dplyr::count(sort = TRUE) %>% 
-        head(n) 
-      
-      if (store==TRUE) {
-        keywords_base_path <- fs::path("keywords", 
-                                       i,
-                                       as.character(j))
+      if (length(all_rds)>0) {
+        all_news <- suppressMessages(purrr::map_df(.x = all_rds,
+                                                   .f = readr::read_rds)) %>% #unisce i file in un singolo data frame
+          dplyr::distinct(link, .keep_all = TRUE)
         
-        fs::dir_create(path = keywords_base_path)
-        saveRDS(object = keywords,
-                file = fs::path(keywords_base_path,
-                                paste0(j, "-keywords_", n, "_", i, ".rds")))
+        keywords <- all_news %>% 
+          dplyr::transmute(title, Date = as.Date(pubDate)) %>%
+          tidytext::unnest_tokens(input = title, output = "words") %>% 
+          dplyr::anti_join(tibble::tibble(words = stopwords::stopwords(language = i, source = "stopwords-iso")), by = "words") %>% # elimina stopwords
+          dplyr::filter(!stringr::str_detect(string = words, pattern = "[[:digit:]]")) %>%  # togliere i numeri registrati come parole
+          dplyr::group_by(words) %>% 
+          dplyr::count(sort = TRUE) %>% 
+          head(n) 
+        
+        if (store==TRUE) {
+          keywords_base_path <- fs::path("keywords", 
+                                         i,
+                                         as.character(j))
+          
+          fs::dir_create(path = keywords_base_path)
+          saveRDS(object = keywords,
+                  file = fs::path(keywords_base_path,
+                                  paste0(j, "-keywords_", n, "_", i, ".rds")))
+        }
       }
-      
     }
-    
-    
   }
-  
-  keywords
+  invisible(keywords)
 }
