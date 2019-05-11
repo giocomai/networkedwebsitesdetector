@@ -7,43 +7,83 @@
 #' @export
 
 
-nwd_archive <- function(date = Sys.Date(),
+nwd_archive <- function(date = NULL,
                         folder = "tweets",
-                        timeframe = "monthly",
-                        language = "it",
+                        timeframe = "daily",
+                        language = NULL,
                         filetype = "rds") {
   
-  date <- as.Date(date)
-  year <- lubridate::year(x = date)
-  month <- lubridate::month(x = date)
-  day <- lubridate::day(x = date)
+  if (is.null(language)) {
+    language <-  fs::dir_ls(path = fs::path(folder),
+                             recurse = FALSE,
+                             type = "directory") %>% 
+      fs::path_file()
+  }
   
-  if (timeframe=="monthly") {
-    fs::dir_create(path = fs::path("archive", language, folder, year), recurse = TRUE)
-    archived_file_location <- fs::path("archive",
-                                       language,
-                                       folder,
-                                       year,
-                                       paste0(year, 
-                                              "-", 
-                                              stringr::str_pad(string = month, width = 2, pad = "0"), 
-                                              "_", 
-                                              language, 
-                                              "_", 
-                                              folder, 
-                                              "_",
-                                              filetype,
-                                              "_monthly.tar.gz"))
-    tar(tarfile = archived_file_location,
-        files = fs::dir_ls(path =  fs::path(folder, language, year, stringr::str_pad(string = month, width = 2, pad = "0")),
-                           recurse = TRUE,
-                           type = "file",
-                           glob = paste0("*", language, ".", filetype)),
-        tar = Sys.which("tar"),
-        compression = "gzip")
+  for (i in language) {
+    if (is.null(date)) {
+      date <- fs::dir_ls(path = fs::path(folder, i), recurse = FALSE, type = "directory") %>% 
+        fs::path_file()
+    }
+    
+    if (timeframe=="daily") {
+      for (j in date) {
+        year <- lubridate::year(j)
+        fs::dir_create(path = fs::path("archive", language, folder, year), recurse = TRUE)
+        archived_file_location <- fs::path("archive",
+                                           i,
+                                           folder,
+                                           year,
+                                           paste0(j, 
+                                                  "_", 
+                                                  i, 
+                                                  "_", 
+                                                  folder, 
+                                                  "_",
+                                                  filetype,
+                                                  "_daily.tar.gz"))
+        if (fs::file_exists(path = archived_file_location)==FALSE) {
+          
+          tar(tarfile = archived_file_location,
+              files = fs::dir_ls(path =  fs::path(folder, i, j),
+                                 recurse = TRUE,
+                                 type = "file",
+                                 glob = paste0("*.", filetype)),
+              tar = Sys.which("tar"),
+              compression = "gzip")
+          
+        }
+      }
+    }
+    
+    if (timeframe=="monthly") {
+      fs::dir_create(path = fs::path("archive", language, folder, year), recurse = TRUE)
+      archived_file_location <- fs::path("archive",
+                                         language,
+                                         folder,
+                                         year,
+                                         paste0(year, 
+                                                "-", 
+                                                stringr::str_pad(string = month, width = 2, pad = "0"), 
+                                                "_", 
+                                                language, 
+                                                "_", 
+                                                folder, 
+                                                "_",
+                                                filetype,
+                                                "_monthly.tar.gz"))
+      tar(tarfile = archived_file_location,
+          files = fs::dir_ls(path =  fs::path(folder, language, year, stringr::str_pad(string = month, width = 2, pad = "0")),
+                             recurse = TRUE,
+                             type = "file",
+                             glob = paste0("*", language, ".", filetype)),
+          tar = Sys.which("tar"),
+          compression = "gzip")
+      
+    }
     
   }
-  archived_file_location
+  
 }
 
 #' Restore data from compressed files
