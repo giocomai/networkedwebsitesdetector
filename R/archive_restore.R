@@ -255,8 +255,13 @@ nwd_adjust_folder_names <- function(folder = "tweets", language = NULL, date = N
     short_paths_split[[i]][3] <- stringr::str_pad(string = short_paths_split[[i]][3],
                                                   width = 2,
                                                   pad = "0")
-    if (length(short_paths_split[[i]])==4) {
+    if (length(short_paths_split[[i]])>3) {
       short_paths_split[[i]][4] <- stringr::str_pad(string = short_paths_split[[i]][4],
+                                                    width = 2,
+                                                    pad = "0")
+    }
+    if (length(short_paths_split[[i]])>4) {
+      short_paths_split[[i]][5] <- stringr::str_pad(string = short_paths_split[[i]][45],
                                                     width = 2,
                                                     pad = "0")
     }
@@ -267,4 +272,45 @@ nwd_adjust_folder_names <- function(folder = "tweets", language = NULL, date = N
   short_paths_l <- as.character(short_paths)!=short_paths_joined
   
   fs::file_move(path = short_paths[short_paths_l], new_path = short_paths_joined[short_paths_l])
+}
+
+#' Adjusts names of nested date folders
+#'
+#' @param language A character vector of language two letter codes. Defaults to NULL. If NULL, processes available languages.
+#' @return Nothing, used for its side effects. 
+#' @examples
+#' 
+#' @export
+
+nwd_adjust_folder_names_nested <- function(folder = "tweets", language = NULL, date = NULL) {
+  if (is.null(date)) {
+    year <- lubridate::year(Sys.Date())
+  } else {
+    year <- lubridate::year(date)
+  }
+  
+  original_month_paths <- fs::dir_ls(path = fs::path(folder, language, year),
+                                     recurse = FALSE,
+                                     type = "directory")
+  
+  for (i in original_month_paths) {
+    original_daily_path <- fs::dir_ls(path = i,
+                                      recurse = FALSE,
+                                      type = "directory") 
+    
+    original_daily_path_split <- original_daily_path %>% 
+      fs::path_split()
+    adjusted_daily_path_split <- list()
+    for (j in seq_along(original_daily_path_split)) {
+      adjusted_daily_path_split[[j]] <- c(original_daily_path_split[[j]][1],
+                                          original_daily_path_split[[j]][2],
+                                          paste(original_daily_path_split[[j]][3], original_daily_path_split[[j]][4], original_daily_path_split[[j]][5], sep = "-"))
+      
+      
+    }
+    
+    adjusted_daily_joined <- fs::path_join(parts = adjusted_daily_path_split)
+    
+    fs::file_move(path = original_daily_path, new_path = adjusted_daily_joined)
+  }
 }

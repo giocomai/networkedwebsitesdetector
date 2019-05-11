@@ -20,9 +20,7 @@ nwd_get_emm_newsbrief <- function(languages = c("ar","bg","cs","da","de","el","e
     
     base_path <- fs::path("emm_newsbrief", 
                           i,
-                          as.character(lubridate::year(Sys.Date())), 
-                          stringr::str_pad(string = lubridate::month(Sys.Date()), width = 2), 
-                          stringr::str_pad(lubridate::day(Sys.Date())), width = 2)
+                          as.character(Sys.Date()))
     fs::dir_create(path = base_path, recurse = TRUE)
     
     xml_location <- fs::path(base_path,
