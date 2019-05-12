@@ -6,15 +6,15 @@
 #' 
 #' @export
 
-extract_domains_from_tweets <- function(language = NULL) {
+nwd_extract_domains_from_tweets <- function(language = NULL) {
   if (is.null(language)==TRUE) {
-    language <- list.dirs(file.path("data", "domains", "homepage"), recursive = FALSE, full.names = FALSE)
+    language <- list.dirs(file.path("tweets"), recursive = FALSE, full.names = FALSE)
   }
-  dir.create(path = file.path("data", "domains"), showWarnings = FALSE)
-  dir.create(path = file.path("data", "domains", "domain_name"), showWarnings = FALSE)
-  dir.create(path = file.path("data", "domains", "domain_name", language), showWarnings = FALSE)
+  dir.create(path = file.path("domains"), showWarnings = FALSE)
 
   for (i in language) {
+    dir.create(path = file.path("domains", i), showWarnings = FALSE)
+    
     csv_files <- list.files(path = file.path("data", "tweets", i),
                            pattern = "\\.csv",
                            full.names = TRUE,
@@ -27,10 +27,9 @@ extract_domains_from_tweets <- function(language = NULL) {
       dplyr::mutate(domain = stringr::str_remove(string = domain, pattern = stringr::fixed("www."))) %>% 
       dplyr::distinct(domain)
     
-    saveRDS(object = all_domains, file = file.path("data", "domains", "domain_name", i, "all_domains.rds"))
+    saveRDS(object = all_domains, file = file.path("domains", i, "all_domains.rds"))
     invisible(all_domains)
   }
-  
 }
 
 
