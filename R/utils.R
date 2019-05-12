@@ -36,7 +36,7 @@ nwd_check_if_exists <- function(domain,
   base_path_failed <- file.path(paste0(type, "_failed"), language)
   
   available_files <- fs::dir_info(path = c(base_path, base_path_failed),
-                                  recursive = FALSE,
+                                  recurse = FALSE,
                                   type = "directory") %>% 
     dplyr::transmute(date = as.Date(stringr::str_remove(string = stringr::str_remove(path, pattern = paste0(base_path_failed, "/")), pattern = paste0(base_path, "/")))) %>% 
     dplyr::distinct(date) %>% 
@@ -110,7 +110,7 @@ nwd_clean_files <- function(min_size = 0,
   if (is.null(language)==TRUE) {
     language <- list.dirs(file.path("homepage"), recursive = FALSE, full.names = FALSE)
   }
-  file_info <- fs::dir_info(path = file.path("homepage", language), recursive = TRUE, type = "file")
+  file_info <- fs::dir_info(path = file.path("homepage", language), recurse = TRUE, type = "file")
   
   file_exceeding <- file_info %>%
     dplyr::filter(size <= fs::as_fs_bytes(x = min_size) | size > fs::as_fs_bytes(x = max_size))
