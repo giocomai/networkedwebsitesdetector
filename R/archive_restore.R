@@ -94,28 +94,43 @@ nwd_archive <- function(date = NULL,
 #' 
 #' @export
 
-nwd_restore <- function(date = Sys.Date(),
+nwd_restore <- function(date = NULL,
                         folder = "tweets",
-                        timeframe = "monthly",
-                        language = "it",
+                        timeframe = "daily",
+                        language = NULL,
                         filetype = "rds") {
-  archived_files_location_l <- fs::dir_ls(path = fs::path("archive", language, folder, lubridate::year(date)),
-                                          recurse = FALSE,
-                                          type = "file",
-                                          glob = paste0("*_",
-                                                        language, 
-                                                        "_", 
-                                                        folder, 
-                                                        "_",
-                                                        filetype,
-                                                        "_", 
-                                                        timeframe, ".tar.gz"))
   
+  if (is.null(language)) {
+    language <-  fs::dir_ls(path = fs::path("archive"),
+                            recurse = FALSE,
+                            type = "directory") %>% 
+      fs::path_file()
+  }
   
-  purrr::walk(.x = archived_files_location_l,
-              .f = function (x) {
-                untar(tarfile = x)
-              })
+  for (i in language) {
+    if (is.null(date)) {
+      date <- fs::dir_ls(path = fs::path("archive", i, folder), recurse = FALSE, type = "directory") %>% 
+        fs::path_file()
+    }
+    
+    archived_files_location_l <- fs::dir_ls(path = fs::path("archive", i, folder, lubridate::year(date)),
+                                            recurse = FALSE,
+                                            type = "file",
+                                            glob = paste0("*_",
+                                                          i, 
+                                                          "_", 
+                                                          folder, 
+                                                          "_",
+                                                          filetype,
+                                                          "_", 
+                                                          timeframe, ".tar.gz"))
+    
+    
+    purrr::walk(.x = archived_files_location_l,
+                .f = function (x) {
+                  untar(tarfile = x)
+                })
+  }
   
 }
 
