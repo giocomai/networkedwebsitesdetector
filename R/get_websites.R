@@ -23,7 +23,7 @@ nwd_get_homepage <- function(domain = NULL,
   fs::dir_create(path = today_path_homepage_failed, recursive = TRUE)
   
   if (is.null(domain)) {
-    all_domains <- readRDS(file = file.path("data", "domains", "domain_name", language, "all_domains.rds"))
+    all_domains <- readRDS(file = file.path("domains", language, "all_domains.rds"))
   } else {
     all_domains <- tibble::tibble(domain = domain)
   }
