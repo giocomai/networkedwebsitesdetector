@@ -15,7 +15,7 @@ nwd_extract_domains_from_tweets <- function(language = NULL) {
   for (i in language) {
     dir.create(path = file.path("domains", i), showWarnings = FALSE)
     
-    csv_files <- list.files(path = file.path("data", "tweets", i),
+    csv_files <- list.files(path = file.path("tweets", i),
                            pattern = "\\.csv",
                            full.names = TRUE,
                            recursive = TRUE)
