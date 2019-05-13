@@ -157,7 +157,7 @@ nwd_add_network_id <- function(identifiers_df = nwd_load_identifiers_df(),
     for (j in 1:nrow(identifiers_df)) {
       pb$tick()$print()
       if (is.na(identifiers_df$network_id[identifiers_df$domain==identifiers_df$domain[j]])) {
-        related_domains <- find_related_domains(domain = identifiers_df$domain[j], identifiers_df = identifiers_df)
+        related_domains <- nwd_find_related_domains(domain = identifiers_df$domain[j], identifiers_df = identifiers_df)
         identifiers_df$network_id[identifiers_df$domain %in% related_domains] <- j
         if (is.null(temporary_files)==FALSE) {
           if (is.element(j, store_when)) {
