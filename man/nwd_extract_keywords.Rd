@@ -4,15 +4,15 @@
 \alias{nwd_extract_keywords}
 \title{Extract most frequently used words from news titles}
 \usage{
-nwd_extract_keywords(languages = NULL, n = 20, date = NULL,
+nwd_extract_keywords(language = NULL, date = NULL, n = 20,
   store = TRUE)
 }
 \arguments{
-\item{n}{An integer. Number of words to keep.}
+\item{language}{A character vector of language two letter codes. Defaults to NULL. If NULL, processes available languages.}
 
 \item{date}{Only news downloaded in the given date will be considered. Defaults to current day. To get data for the previous day, use `Sys.Date()-1`}
 
-\item{language}{A character vector of language two letter codes. Defaults to NULL. If NULL, processes available languages.}
+\item{n}{An integer. Number of words to keep.}
 }
 \value{
 A data.frame (a tibble) with `n` number of rows and two columns, `words` and `n` for number of occurrences.

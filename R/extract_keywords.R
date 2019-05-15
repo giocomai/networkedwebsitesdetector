@@ -8,20 +8,20 @@
 #' 
 #' @export
 
-nwd_extract_keywords <- function(languages = NULL,
+nwd_extract_keywords <- function(language = NULL,
+                                 date = NULL,
                                  n = 20,
-                                 date = NULL, 
                                  store = TRUE) {
   
-  if (is.null(languages)) {
-    languages <-  fs::dir_ls(path = fs::path("emm_newsbrief"),
+  if (is.null(language)) {
+    language <-  fs::dir_ls(path = fs::path("emm_newsbrief"),
                              recurse = FALSE,
                              type = "directory") %>% 
       fs::path_file()
   }
   
   
-  for (i in languages) {
+  for (i in language) {
     
     if (is.null(date)) {
       date <- fs::dir_ls(path = fs::path("emm_newsbrief", i), recurse = FALSE, type = "directory") %>% 
