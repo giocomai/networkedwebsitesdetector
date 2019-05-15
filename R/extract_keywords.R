@@ -1,7 +1,7 @@
 #' Extract most frequently used words from news titles 
 #'
 #' @param language A character vector of language two letter codes. Defaults to NULL. If NULL, processes available languages.
-#' @param n An integer. Number of words to keep. 
+#' @param n An integer. Number of words to keep. Defaults to `Inf` (i.e. keeps all words, ordered by frequency).
 #' @param date Only news downloaded in the given date will be considered. Defaults to current day. To get data for the previous day, use `Sys.Date()-1` 
 #' @return A data.frame (a tibble) with `n` number of rows and two columns, `words` and `n` for number of occurrences.
 #' @examples
@@ -10,7 +10,7 @@
 
 nwd_extract_keywords <- function(language = NULL,
                                  date = NULL,
-                                 n = 20,
+                                 n = Inf,
                                  store = TRUE) {
   
   if (is.null(language)) {
@@ -50,8 +50,7 @@ nwd_extract_keywords <- function(language = NULL,
         
         if (store==TRUE) {
           keywords_base_path <- fs::path("keywords", 
-                                         i,
-                                         as.character(j))
+                                         i)
           
           fs::dir_create(path = keywords_base_path)
           saveRDS(object = keywords,
