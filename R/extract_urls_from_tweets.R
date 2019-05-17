@@ -84,7 +84,7 @@ nwd_expand_urls_from_tweets <- function(tweets,
     
     if (n_retry > 0) {
       for (i in 1:n_retry) {
-        if (is.null(all_links_long)) == FALSE {
+        if (is.null(all_links_long) == FALSE) {
           all_links_long_pre_retry <- 
             all_links_long %>% 
             dplyr::filter(is.na(expanded_url)==TRUE) %>% 
