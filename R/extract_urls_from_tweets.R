@@ -111,19 +111,16 @@ nwd_expand_urls_from_tweets <- function(tweets,
                                                true = as.character(orig_url),
                                                false = as.character(expanded_url))) %>% 
             dplyr::ungroup() 
-
+          return(all_links_long_merged) 
         }
       }
-    } else {
-      all_links_long_merged <- 
-        all_links %>% 
-        dplyr::rename(orig_url = urls_expanded_url) %>%  
-        dplyr::mutate(expanded_url = as.character(NA),
-                      status_code = as.integer(NA), 
-                      url = as.character(orig_url)) %>% 
-        dplyr::ungroup() 
-    }
-    return(all_links_long_merged) 
+    } 
   }
   
+  all_links %>% 
+    dplyr::rename(orig_url = urls_expanded_url) %>%  
+    dplyr::mutate(expanded_url = as.character(NA),
+                  status_code = as.integer(NA), 
+                  url = as.character(orig_url)) %>% 
+    dplyr::ungroup() 
 }
