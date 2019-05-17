@@ -112,8 +112,12 @@ nwd_restore <- function(date = NULL,
       date <- fs::dir_ls(path = fs::path("archive", i, folder), recurse = FALSE, type = "directory") %>% 
         fs::path_file()
     }
-    
-    archived_files_location_l <- fs::dir_ls(path = fs::path("archive", i, folder, lubridate::year(date)),
+    if (sum(nchar(date)>4)>0) {
+      year <- lubridate::year(date)
+    } else {
+      year <- date
+    }
+    archived_files_location_l <- fs::dir_ls(path = fs::path("archive", i, folder, year),
                                             recurse = FALSE,
                                             type = "file",
                                             glob = paste0("*_",
