@@ -16,12 +16,6 @@ nwd_get_homepage <- function(domain = NULL,
     language <- list.dirs(file.path("homepage"), recursive = FALSE, full.names = FALSE)
   }
   
-  today_path_homepage <- file.path("homepage", language, Sys.Date())
-  today_path_homepage_failed <- file.path("homepage_failed", language, Sys.Date())
-  
-  fs::dir_create(path = today_path_homepage, recurse = TRUE)
-  fs::dir_create(path = today_path_homepage_failed, recurse = TRUE)
-  
   if (is.null(domain)) {
     all_domains <- readRDS(file = file.path("domains", language, "all_domains.rds"))
   } else {
@@ -38,6 +32,10 @@ nwd_get_homepage <- function(domain = NULL,
   purrr::walk(.x = domain,
               .f =  function(x) {pb$tick()$print()
                 if (networkedwebsitesdetector::nwd_check_if_exists(domain = x, type = "homepage")==FALSE) {
+                  today_path_homepage <- file.path("homepage", language, Sys.Date())
+                  today_path_homepage_failed <- file.path("homepage_failed", language, Sys.Date())
+                  fs::dir_create(path = today_path_homepage, recurse = TRUE)
+                  fs::dir_create(path = today_path_homepage_failed, recurse = TRUE)
                   tryCatch({download.file(url = x,
                                           destfile = file.path(today_path_homepage, paste0(x, ".html")))},
                            error=function(e){
