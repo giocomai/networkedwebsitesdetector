@@ -79,49 +79,51 @@ nwd_expand_urls_from_tweets <- function(tweets,
       dplyr::filter(nchar(urls_expanded_url)<n_char) %>% 
       dplyr::pull(urls_expanded_url) 
     
-    all_links_long <- tryCatch({longurl::expand_urls(all_links_long_pre)},
-                               error=function(e){cat("ERROR:",conditionMessage(e), "\n")})
-    
-    if (n_retry > 0) {
-      for (i in 1:n_retry) {
-        if (is.null(all_links_long) == FALSE) {
-          all_links_long_pre_retry <- 
-            all_links_long %>% 
-            dplyr::filter(is.na(expanded_url)==TRUE) %>% 
-            dplyr::pull(orig_url)
-          
-          all_links_long_retry <- tryCatch({longurl::expand_urls(all_links_long_pre_retry)},
-                                           error=function(e){cat("ERROR:",conditionMessage(e), "\n")})
-          
-          all_links_long <- dplyr::bind_rows(all_links_long_retry, all_links_long) %>% 
-            dplyr::distinct(orig_url, .keep_all=TRUE)
-          
+    if (length(all_links_long_pre)>0) {
+      all_links_long <- tryCatch({longurl::expand_urls(all_links_long_pre)},
+                                 error=function(e){cat("ERROR:",conditionMessage(e), "\n")})
+      
+      if (n_retry > 0) {
+        for (i in 1:n_retry) {
+          if (is.null(all_links_long) == FALSE) {
+            all_links_long_pre_retry <- 
+              all_links_long %>% 
+              dplyr::filter(is.na(expanded_url)==TRUE) %>% 
+              dplyr::pull(orig_url)
+            
+            all_links_long_retry <- tryCatch({longurl::expand_urls(all_links_long_pre_retry)},
+                                             error=function(e){cat("ERROR:",conditionMessage(e), "\n")})
+            
+            all_links_long <- dplyr::bind_rows(all_links_long_retry, all_links_long) %>% 
+              dplyr::distinct(orig_url, .keep_all=TRUE)
+            
+          }
         }
+      }
+      
+      if (is.null(all_links_long)==FALSE) {
+        if (nrow(all_links_long)>0) {
+          all_links_long_merged <- 
+            all_links %>% 
+            dplyr::rename(orig_url = urls_expanded_url) %>% 
+            dplyr::left_join(y = all_links_long, by = "orig_url") %>% 
+            dplyr::mutate(url = dplyr::if_else(condition = is.na(expanded_url),
+                                               true = as.character(orig_url),
+                                               false = as.character(expanded_url))) %>% 
+            dplyr::ungroup() 
 
-        
+        }
       }
+    } else {
+      all_links_long_merged <- 
+        all_links %>% 
+        dplyr::rename(orig_url = urls_expanded_url) %>%  
+        dplyr::mutate(expanded_url = as.character(NA),
+                      status_code = as.integer(NA), 
+                      url = as.character(orig_url)) %>% 
+        dplyr::ungroup() 
     }
-    
-    if (is.null(all_links_long)==FALSE) {
-      if (nrow(all_links_long)>0) {
-        all_links_long_merged <- 
-          all_links %>% 
-          dplyr::rename(orig_url = urls_expanded_url) %>% 
-          dplyr::left_join(y = all_links_long, by = "orig_url") %>% 
-          dplyr::mutate(url = dplyr::if_else(condition = is.na(expanded_url),
-                                             true = as.character(orig_url),
-                                             false = as.character(expanded_url))) %>% 
-          dplyr::ungroup() 
-        
-        return(all_links_long_merged)
-      }
-    }
+    return(all_links_long_merged) 
   }
+  
 }
-
-
-
-
-
-
-
