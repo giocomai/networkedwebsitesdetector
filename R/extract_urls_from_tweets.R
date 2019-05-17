@@ -84,16 +84,20 @@ nwd_expand_urls_from_tweets <- function(tweets,
     
     if (n_retry > 0) {
       for (i in 1:n_retry) {
-        all_links_long_pre_retry <- 
-          all_links_long %>% 
-          dplyr::filter(is.na(expanded_url)==TRUE) %>% 
-          dplyr::pull(orig_url)
-        
-        all_links_long_retry <- tryCatch({longurl::expand_urls(all_links_long_pre_retry)},
-                                         error=function(e){cat("ERROR:",conditionMessage(e), "\n")})
-        
-        all_links_long <- dplyr::bind_rows(all_links_long_retry, all_links_long) %>% 
-          dplyr::distinct(orig_url, .keep_all=TRUE)
+        if (is.null(all_links_long)) == FALSE {
+          all_links_long_pre_retry <- 
+            all_links_long %>% 
+            dplyr::filter(is.na(expanded_url)==TRUE) %>% 
+            dplyr::pull(orig_url)
+          
+          all_links_long_retry <- tryCatch({longurl::expand_urls(all_links_long_pre_retry)},
+                                           error=function(e){cat("ERROR:",conditionMessage(e), "\n")})
+          
+          all_links_long <- dplyr::bind_rows(all_links_long_retry, all_links_long) %>% 
+            dplyr::distinct(orig_url, .keep_all=TRUE)
+          
+        }
+
         
       }
     }
