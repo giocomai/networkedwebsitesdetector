@@ -112,10 +112,11 @@ nwd_expand_urls_from_tweets <- function(tweets,
                                              true = as.character(orig_url),
                                              false = as.character(expanded_url))) %>% 
           dplyr::ungroup() 
+        
+        return(all_links_long_merged)
       }
     }
   }
-  return(all_links_long_merged)
 }
 
 
