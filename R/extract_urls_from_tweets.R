@@ -59,7 +59,7 @@ nwd_extract_urls_from_tweets <- function(tweets = NULL,
 #' 
 #' @param tweets A data frame of tweets, as created by `rtweet`. 
 #' @param n_char An integer, defaults to 30. Number of characters in the url: only urls shorter than n_char will be expanded, others will be kept as they are.  
-#' @param n_retry An integer, defaults to 3. Number of times it tries to expand urls if first attempt fails. Set to 0 for attempting only once.
+#' @param n_retry An integer, defaults to 1. Number of times it tries to expand urls if first attempt fails. Set to 0 for attempting only once.
 #' @return A data.frame (a tibble) with 9 columns: "user_id", "status_id", "created_at", "screen_name", text", "orig_url","expanded_url", "status_code", "url" 
 #' @examples
 #' 
@@ -68,7 +68,7 @@ nwd_extract_urls_from_tweets <- function(tweets = NULL,
 
 nwd_expand_urls_from_tweets <- function(tweets,
                                         n_char = 30,
-                                        n_retry = 3) {
+                                        n_retry = 1) {
   if (nrow(tweets)>0) {
     all_links <- tweets %>% 
       dplyr::select(user_id, status_id, created_at, screen_name, text, urls_expanded_url) %>% 
@@ -116,7 +116,7 @@ nwd_expand_urls_from_tweets <- function(tweets,
       }
     } 
   }
-  
+    
   all_links %>% 
     dplyr::rename(orig_url = urls_expanded_url) %>%  
     dplyr::mutate(expanded_url = as.character(NA),
