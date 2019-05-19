@@ -4,10 +4,13 @@
 \alias{nwd_get_homepage}
 \title{Download homepages by url in relevant sub-folder.}
 \usage{
-nwd_get_homepage(domain = NULL, language = NULL, shuffle = TRUE)
+nwd_get_homepage(domain = NULL, language = NULL, shuffle = TRUE,
+  since = Sys.Date() - 91)
 }
 \arguments{
 \item{domain}{A character vector of one or more domain names.}
+
+\item{since}{A date. Passed to `nwd_check_if_exists()`. Only domains that have not been downloaded since the given date are downloaded.}
 }
 \value{
 Nothing, used for its side effects.

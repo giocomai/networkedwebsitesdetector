@@ -11,6 +11,8 @@ nwd_check_if_exists(domain, type = "homepage", language = NULL,
 \item{domain}{A domain name (e.g. "example.com").}
 
 \item{type}{Type of file to check, defaults to "homepage". Alternative options: "screenshots".}
+
+\item{since}{A date. `nwd_check_if_exists()` returns TRUE only if the given link has been downloaded or (failed to download) after the given date.}
 }
 \value{
 If `simplify` is TRUE, it returns a logical vector of length 1, either TRUE or FALSE. If `simplify == FALSE`, it returns a data frame with details on the availability of files related to the given domain.

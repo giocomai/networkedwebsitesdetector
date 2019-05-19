@@ -3,6 +3,7 @@
 #' Download homepages by url in relevant sub-folder, divide by date of download. By default, does not overwrite, and shuffles the order in which given domain names are downloaded.
 #'
 #' @param domain A character vector of one or more domain names. 
+#' @param since A date. Passed to `nwd_check_if_exists()`. Only domains that have not been downloaded since the given date are downloaded.
 #' @return Nothing, used for its side effects. 
 #' @examples
 #' 
@@ -11,7 +12,8 @@
 
 nwd_get_homepage <- function(domain = NULL,
                              language = NULL,
-                             shuffle = TRUE) {
+                             shuffle = TRUE,
+                             since = Sys.Date() - 91) {
   if (is.null(language)==TRUE) {
     language <- list.dirs(file.path("homepage"), recursive = FALSE, full.names = FALSE)
   }
@@ -31,7 +33,7 @@ nwd_get_homepage <- function(domain = NULL,
   pb <- dplyr::progress_estimated(length(domain))
   purrr::walk(.x = domain,
               .f =  function(x) {pb$tick()$print()
-                if (networkedwebsitesdetector::nwd_check_if_exists(domain = x, type = "homepage")==FALSE) {
+                if (networkedwebsitesdetector::nwd_check_if_exists(domain = x, type = "homepage", since = since)==FALSE) {
                   today_path_homepage <- file.path("homepage", language, Sys.Date())
                   today_path_homepage_failed <- file.path("homepage_failed", language, Sys.Date())
                   fs::dir_create(path = today_path_homepage, recurse = TRUE)
