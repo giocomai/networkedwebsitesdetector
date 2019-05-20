@@ -153,9 +153,9 @@ nwd_extract_identifiers_from_backup <- function(language) {
   }
 
   if (nrow(backup_homepages_not_processed)>0) {
-    for (i in 1:nrow(backuped_homepaged_not_processed)) {
+    for (i in 1:nrow(backup_homepages_not_processed)) {
       fs::dir_create(path = "nwd_temp")
-      googledrive::drive_download(file = backuped_homepaged_not_processed %>%
+      googledrive::drive_download(file = backup_homepages_not_processed %>%
                                     dplyr::slice(i),
                                   path = fs::path("nwd_temp", "temp.tar.gz"))
       untar(tarfile = fs::path("nwd_temp", "temp.tar.gz"), exdir = "nwd_temp")
