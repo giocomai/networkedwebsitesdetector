@@ -10,9 +10,18 @@
 
 nwd_extract_identifiers <- function(language = NULL,
                                     progress_bar = TRUE,
-                                    sample = NULL) {
+                                    sample = NULL, 
+                                    temp = FALSE) {
+  if (temp == TRUE) {
+    homepage_folder <- fs::path("nwd_temp", "homepage")
+    
+  } else {
+    homepage_folder <- fs::path("homepage")
+  }
+
+  
   if (is.null(language)) {
-    language <- fs::dir_ls(path = fs::path("homepage"),
+    language <- fs::dir_ls(path = homepage_folder,
                            recurse = FALSE,
                            type = "directory") %>% 
       fs::path_file()
@@ -20,7 +29,7 @@ nwd_extract_identifiers <- function(language = NULL,
   
   for (i in language) {
     fs::dir_create(path = fs::path("identifiers", i), recurse = TRUE)
-    html_location <- fs::path("homepage", i)
+    html_location <- fs::path(homepage_folder, i)
     
     html_dirs <- fs::dir_ls(path = html_location, recurse = FALSE, type = "directory")
     
@@ -108,6 +117,45 @@ nwd_extract_identifiers <- function(language = NULL,
         message(paste("\nIdentifiers stored in",
                       file.path(base_folder, paste0(temp_date, "_", "identifiers_df.rds"))))
       }
+    }
+  }
+}
+
+#' Extract identifiers from backuped homepages
+#'
+#' @param language A character vector of length one corresponding to a language two-letter code.
+#' @return Nothing, used for its side effects. 
+#' @examples
+#' 
+#' @export
+#' 
+
+nwd_extract_identifiers_from_backup <- function(language) {
+  available_backups_on_google_drive <-
+    nwd_list_available_backups_on_google_drive(folder = "homepage",
+                                               timeframe = "daily",
+                                               language = language,
+                                               filetype = "html")
+  
+  identifiers_done_dates <- fs::dir_ls(path = fs::path("identifiers", language)) %>%
+    fs::path_file()
+  
+  backuped_homepaged_not_processed <- 
+    available_backups_on_google_drive %>% 
+    dplyr::filter(stringr::str_detect(string = name,
+                                      pattern = paste(identifiers_done_dates,
+                                                      collapse = "|"),
+                                      negate = TRUE))
+  
+  if (nrow(backuped_homepaged_not_processed)>0) {
+    for (i in 1:nrow(backuped_homepaged_not_processed)) {
+      fs::dir_create(path = "nwd_temp")
+      googledrive::drive_download(file = backuped_homepaged_not_processed %>%
+                                    dplyr::slice(i),
+                                  path = fs::path("nwd_temp", "temp.tar.gz"))
+      untar(tarfile = fs::path("nwd_temp", "temp.tar.gz"), exdir = "nwd_temp")
+      nwd_extract_identifiers(language = language, progress_bar = TRUE, temp = TRUE)
+      fs::dir_delete(path = "nwd_temp")
     }
   }
 }

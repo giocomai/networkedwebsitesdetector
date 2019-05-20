@@ -5,7 +5,7 @@
 \title{Extract identifiers from web pages}
 \usage{
 nwd_extract_identifiers(language = NULL, progress_bar = TRUE,
-  sample = NULL)
+  sample = NULL, temp = FALSE)
 }
 \arguments{
 \item{language}{A character vector of length one corresponding to a language two-letter code. Defaults to NULL. If NULL, processes available language. If more than one, throws error.}

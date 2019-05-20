@@ -23,6 +23,7 @@ nwd_get_homepage <- function(domain = NULL,
   }
   
   fs::dir_create(path = fs::path("homepage", language))
+  fs::dir_create(path = fs::path("homepage_failed", language))
   
   if (is.null(domain)) {
     all_domains <- readRDS(file = file.path("domains", language, "all_domains.rds"))

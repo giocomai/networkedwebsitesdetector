@@ -2,7 +2,7 @@
 % Please edit documentation in R/archive_data.R
 \name{archive_screenshots}
 \alias{archive_screenshots}
-\title{Archives folders.}
+\title{Archives screenshots}
 \usage{
 archive_screenshots(language = NULL)
 }
