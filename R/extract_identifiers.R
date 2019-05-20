@@ -141,14 +141,18 @@ nwd_extract_identifiers_from_backup <- function(language) {
   identifiers_done_dates <- fs::dir_ls(path = fs::path("identifiers", language)) %>%
     fs::path_file()
   
-  backuped_homepaged_not_processed <- 
-    available_backups_on_google_drive %>% 
-    dplyr::filter(stringr::str_detect(string = name,
-                                      pattern = paste(identifiers_done_dates,
-                                                      collapse = "|"),
-                                      negate = TRUE))
-  
-  if (nrow(backuped_homepaged_not_processed)>0) {
+  if (length(identifiers_done_dates)>0) {
+    backup_homepages_not_processed <- 
+      available_backups_on_google_drive %>% 
+      dplyr::filter(stringr::str_detect(string = name,
+                                        pattern = paste(identifiers_done_dates,
+                                                        collapse = "|"),
+                                        negate = TRUE))
+  } else {
+    backup_homepages_not_processed <- available_backups_on_google_drive
+  }
+
+  if (nrow(backup_homepages_not_processed)>0) {
     for (i in 1:nrow(backuped_homepaged_not_processed)) {
       fs::dir_create(path = "nwd_temp")
       googledrive::drive_download(file = backuped_homepaged_not_processed %>%
