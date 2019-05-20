@@ -137,6 +137,7 @@ nwd_extract_identifiers_from_backup <- function(language) {
                                                language = language,
                                                filetype = "html")
   
+  fs::dir_create(path = fs::path("identifiers", language), recurse = TRUE)
   identifiers_done_dates <- fs::dir_ls(path = fs::path("identifiers", language)) %>%
     fs::path_file()
   
