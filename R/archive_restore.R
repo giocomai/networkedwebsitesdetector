@@ -399,3 +399,55 @@ nwd_adjust_folder_names_nested <- function(folder = "tweets", language = NULL, d
     fs::file_move(path = original_daily_path, new_path = adjusted_daily_joined)
   }
 }
+
+#' List available backups on Google Drive
+#'
+#' @param language A character vector of language two letter codes. Defaults to NULL. If NULL, processes available languages.
+#' @return A dribble, a data frame (tibble) of the 'googledrive' package including details on the file on Google Drive.
+#' @examples
+#' 
+#' @export
+
+nwd_list_available_backups_on_google_drive <- function(date = NULL,
+                                                       folder = "tweets",
+                                                       timeframe = "daily",
+                                                       language = NULL,
+                                                       filetype = "rds") {
+  home_d <- googledrive::drive_ls() %>% dplyr::filter(name=="networkedwebsitesdetector")
+  
+  all_languages_folder <- googledrive::drive_ls(path = home_d)
+  
+  if (is.null(language)==TRUE) {
+    language <- all_languages_folder$name
+  }
+  
+  purrr::map_dfr(.x = language,
+                 .f = function (i) {
+                   language_folder_d <-  all_languages_folder%>% 
+                     dplyr::filter(name==i)
+                   
+                   all_types_folder_d <- googledrive::drive_ls(path = language_folder_d)
+                   
+                   type_folder_d <- all_types_folder_d %>%
+                     dplyr::filter(name==folder)
+                   
+                   ## year folder
+                   
+                   all_years_folder_d <- googledrive::drive_ls(path = type_folder_d)
+                   
+                   years <- all_years_folder_d$name
+                   
+                   purrr::map_dfr(.x = years, 
+                                  .f = function(x) {
+                                    year_folder_d <- all_years_folder_d %>%
+                                      dplyr::filter(name==as.character(x))
+                                    
+                                    googledrive::drive_ls(path = year_folder_d) %>% 
+                                      dplyr::filter(stringr::str_detect(string = name,
+                                                                        pattern = paste0(filetype, "_", timeframe, ".tar.gz")))
+                                    
+                                  })
+                   
+                 })
+  
+}
