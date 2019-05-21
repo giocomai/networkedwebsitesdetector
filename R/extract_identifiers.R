@@ -73,7 +73,7 @@ nwd_extract_identifiers <- function(language = NULL,
                                                 pattern = stringr::regex("ca-pub-[[:digit:]][[:digit:]]+", ignore_case = TRUE))
           
           taboola[k] <- purrr::map(.x = purrr::map(.x = stringr::str_extract_all(string = temp,
-                                                                                 pattern = stringr::regex("taboola.com/libtrc/[[:print:]]+/", ignore_case = TRUE)), .f = function(x) stringr::str_remove(string = x, pattern = c("taboola.com/libtrc/"))), .f = function(x) stringr::str_remove(string = x, pattern = c("/$")))
+                                                                                 pattern = stringr::regex("taboola.com/libtrc/[[:print:]]+/", ignore_case = TRUE)), .f = function(x) stringr::str_remove(string = x, pattern = c("taboola.com/libtrc/"))), .f = function(x) stringr::str_remove(string = x, pattern = c("\\/.*")))
           
           temp <- tryCatch(expr = xml2::read_html(html_files[k]),
                            error = function(e) {
