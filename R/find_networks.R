@@ -152,17 +152,20 @@ nwd_add_network_id <- function(identifiers_df = nwd_load_identifiers_df(),
       store_when <- cumsum(rep(round(nrow(identifiers_df)/temporary_files), temporary_files))
     }
     
-    fs::dir_create(path = file.path("temp", "identifiers", i), recurse = TRUE)
+    fs::dir_create(path = file.path("nwd_temp_identifiers", i), recurse = TRUE)
     pb <- dplyr::progress_estimated(n = nrow(identifiers_df), min_time = 1)
     for (j in 1:nrow(identifiers_df)) {
       pb$tick()$print()
-      if (is.na(identifiers_df$network_id[identifiers_df$domain==identifiers_df$domain[j]])) {
-        related_domains <- nwd_find_related_domains(domain = identifiers_df$domain[j], identifiers_df = identifiers_df)
-        identifiers_df$network_id[identifiers_df$domain %in% related_domains] <- j
+      
+      # TODO deal with data stored on different dates
+
+      if (is.na(identifiers_df$network_id[j])) {
+        related_domains <- nwd_find_related_domains(domain = identifiers_df$domain[j], identifiers_df = identifiers_df, identifiers = colnames(identifiers_df)[-2:-1])
+        identifiers_df$network_id[identifiers_df$domain %in% related_domains] <- min(j, identifiers_df$network_id[identifiers_df$domain %in% related_domains], na.rm = TRUE)
         if (is.null(temporary_files)==FALSE) {
           if (is.element(j, store_when)) {
             saveRDS(object = identifiers_df,
-                    file = file.path("temp", "identifiers", paste0("network_df-", j, ".rds")))
+                    file = file.path("nwd_temp_identifiers", i, paste0("network_df-", j, ".rds")))
             message(paste("\nTemporary files stored after processing", j, "lines"))
           }
           
