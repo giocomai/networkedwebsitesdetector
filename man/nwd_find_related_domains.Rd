@@ -4,7 +4,8 @@
 \alias{nwd_find_related_domains}
 \title{Find domains related to each across key identifiers}
 \usage{
-nwd_find_related_domains(domain, identifiers_df = load_identifiers_df(),
+nwd_find_related_domains(domain,
+  identifiers_df = nwd_load_identifiers_df(),
   identifiers = default_identifiers, language = NULL, run_n = 3)
 }
 \arguments{

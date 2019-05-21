@@ -90,7 +90,9 @@ nwd_load_identifiers_df <- function(language = NULL) {
     language <- list.dirs(file.path("identifiers"), recursive = FALSE, full.names = FALSE)
   }
   base_path <- file.path("identifiers", language)
-  purrr::map_dfr(.x = fs::dir_ls(fs::dir_ls(path = base_path)), .f = readRDS)
+  purrr::map_dfr(.x = fs::dir_ls(path = base_path, recurse = TRUE, type = "file", glob = "*.rds"),
+                 .f = readRDS, .id = "date") %>% 
+    dplyr::mutate(date = as.Date(fs::path_file(fs::path_dir(date))))
 }
 
 #' Check if there are unusually small or unusually big files
