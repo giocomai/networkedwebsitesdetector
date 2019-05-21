@@ -52,6 +52,7 @@ nwd_extract_identifiers <- function(language = NULL,
         fb_admins   <- rep(x = as.character(NA), length = length(html_files))
         fb_page_id   <- rep(x = as.character(NA), length = length(html_files))
         fb_app_id   <- rep(x = as.character(NA), length = length(html_files))
+        taboola <- rep(x = as.character(NA), length = length(html_files))
         
         if (progress_bar == TRUE) {
           pb <- dplyr::progress_estimated(n = length(html_files), min_time = 1)
@@ -70,6 +71,10 @@ nwd_extract_identifiers <- function(language = NULL,
                                             pattern = stringr::regex("UA-[[:digit:]][[:digit:]][[:digit:]][[:digit:]]+", ignore_case = FALSE))
           ca_pub[k] <- stringr::str_extract_all(string = temp,
                                                 pattern = stringr::regex("ca-pub-[[:digit:]][[:digit:]]+", ignore_case = TRUE))
+          taboola[k] <- stringr::str_extract(string = temp,
+                                                 pattern = stringr::regex("taboola.com/libtrc/[[:print:]]+/", ignore_case = TRUE)) %>% 
+            stringr::str_remove(pattern = c("taboola.com/libtrc/")) %>%
+            stringr::str_remove(pattern = "/$")
           
           temp <- tryCatch(expr = xml2::read_html(html_files[k]),
                            error = function(e) {
@@ -106,7 +111,8 @@ nwd_extract_identifiers <- function(language = NULL,
                                          ca_pub = ca_pub,
                                          fb_admins = fb_admins, 
                                          fb_page_id = fb_page_id, 
-                                         fb_app_id = fb_app_id)
+                                         fb_app_id = fb_app_id, 
+                                         taboola = taboola)
         
         
         

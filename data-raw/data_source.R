@@ -25,6 +25,7 @@ default_identifiers <- c("ua",
                          "ca_pub",
                          "fb_admins",
                          "fb_page_id",
-                         "fb_app_id")
+                         "fb_app_id",
+                         "taboola")
 
 usethis::use_data(default_identifiers, overwrite = TRUE)
