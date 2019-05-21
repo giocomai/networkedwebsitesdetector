@@ -71,10 +71,10 @@ nwd_extract_identifiers <- function(language = NULL,
                                             pattern = stringr::regex("UA-[[:digit:]][[:digit:]][[:digit:]][[:digit:]]+", ignore_case = FALSE))
           ca_pub[k] <- stringr::str_extract_all(string = temp,
                                                 pattern = stringr::regex("ca-pub-[[:digit:]][[:digit:]]+", ignore_case = TRUE))
-          taboola[k] <- stringr::str_extract(string = temp,
+          taboola[k] <- as.list(stringr::str_extract_all(string = temp,
                                                  pattern = stringr::regex("taboola.com/libtrc/[[:print:]]+/", ignore_case = TRUE)) %>% 
-            stringr::str_remove(pattern = c("taboola.com/libtrc/")) %>%
-            stringr::str_remove(pattern = "/$")
+            stringr::str_remove_all(pattern = c("taboola.com/libtrc/")) %>%
+            stringr::str_remove_all(pattern = "/$"))
           
           temp <- tryCatch(expr = xml2::read_html(html_files[k]),
                            error = function(e) {
