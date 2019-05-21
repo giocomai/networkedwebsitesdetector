@@ -21,7 +21,9 @@ Imports:
     rtweet,
     longurl,
     tidytext,
-    lubridate
+    lubridate,
+    ggraph,
+    tidygraph
 Remotes: 
     Thinkr-open/golem
 RoxygenNote: 6.1.1

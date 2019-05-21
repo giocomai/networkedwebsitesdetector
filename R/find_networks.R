@@ -180,3 +180,130 @@ nwd_add_network_id <- function(identifiers_df = nwd_load_identifiers_df(),
     return(identifiers_df)
   }
 }
+
+
+#' Create a graph of the network of one or more domains
+#'
+#'
+#' @param identifiers_df A data frame, typically created with extract extract_identifiers() and loaded with load_identifiers_df().
+#' @return A data.frame (a tibble) including a network_id column grouping all domains that have elements in common.
+#' @examples
+#' 
+#' @export
+#' 
+#' 
+
+nwd_create_domain_graph_all_connections <- function(domains,
+                                                identifiers_df = nwd_load_identifiers_df(),
+                                                identifiers = default_identifiers) {
+  temp_identifiers_df <- identifiers_df %>% 
+    dplyr::filter(is.element(el = domain, set = domains)) 
+  
+  
+  all_connections <- purrr::map_dfr(.x = identifiers, .f = function(x) temp_identifiers_df %>% 
+                                      dplyr::select(domain, x) %>% 
+                                      tidyr::unnest() %>% 
+                                      dplyr::distinct() %>% 
+                                      magrittr::set_colnames(c("domain", "identifier")) %>% 
+                                      dplyr::transmute(source = domain, destination = domain, identifier) %>% 
+                                      dplyr::group_by(identifier) %>% 
+                                      tidyr::complete(source, destination) %>% 
+                                      dplyr::ungroup() %>%
+                                      dplyr::arrange(identifier) %>% 
+                                      dplyr::select(source, destination, identifier) %>% 
+                                      dplyr::filter(source!=destination) %>% 
+                                      dplyr::filter(identifier!="")) %>% 
+    dplyr::group_by(source, destination) %>% 
+    dplyr::add_count()
+  
+  
+  
+  edges <- all_connections %>% 
+    dplyr::left_join(nodes, by = c("source" = "label")) %>% 
+    dplyr::rename(from = id)
+  
+  edges <- edges %>% 
+    dplyr::left_join(nodes, by = c("destination" = "label")) %>% 
+    dplyr::rename(to = id)
+  
+  identifier_tidy <- tidygraph::tbl_graph(nodes = nodes, edges = edges, directed = FALSE)
+  identifier_tidy
+}
+
+
+#' Create a graph of the network of one or more domains
+#'
+#'
+#' @param identifiers_df A data frame, typically created with extract extract_identifiers() and loaded with load_identifiers_df().
+#' @return A data.frame (a tibble) including a network_id column grouping all domains that have elements in common.
+#' @examples
+#' 
+#' @export
+#' 
+#' 
+
+nwd_create_domain_graph_identifiers <- function(domains,
+                                            identifiers_df = nwd_load_identifiers_df(),
+                                            identifiers = networkedwebsitesdetector::default_identifiers,
+                                            only_shared_identifiers = TRUE, 
+                                            plot = TRUE) {
+  if (length(domains)==1) {
+    domains <- nwd_find_related_domains(domain = domains)
+  }
+  
+  temp_identifiers_df <- identifiers_df %>% 
+    dplyr::filter(is.element(el = domain, set = domains)) 
+  
+  
+  all_connections <- purrr::map_dfr(.x = identifiers, .f = function(x) temp_identifiers_df %>% 
+                                      dplyr::select(domain, x) %>% 
+                                      tidyr::unnest() %>% 
+                                      dplyr::distinct() %>% 
+                                      magrittr::set_colnames(c("domain", "identifier")) %>% 
+                                      dplyr::transmute(source = domain, destination = identifier)) %>% 
+    dplyr::group_by(destination) %>% 
+    dplyr::add_count() %>% 
+    dplyr::ungroup()
+  
+  if (only_shared_identifiers==TRUE) {
+    all_connections <- all_connections %>% 
+      dplyr::filter(n>1)
+    
+  }
+  
+  
+  nodes <- dplyr::bind_rows(domains = all_connections %>% 
+                              dplyr::distinct(source) %>% 
+                              dplyr::rename(label = source),
+                            identifiers = all_connections %>% 
+                              dplyr::distinct(destination)%>% 
+                              dplyr::rename(label = destination), .id = "type") %>% 
+    tidyr::drop_na() %>% 
+    tibble::rowid_to_column("id")
+  
+  
+  
+  edges <- all_connections %>% 
+    dplyr::left_join(nodes, by = c("source" = "label")) %>% 
+    dplyr::rename(from = id)
+  
+  edges <- edges %>% 
+    dplyr::left_join(nodes, by = c("destination" = "label")) %>% 
+    dplyr::rename(to = id) %>% 
+    dplyr::filter((is.na(from)|is.na(to))==FALSE)
+  
+  identifier_tidy <- tidygraph::tbl_graph(nodes = nodes,
+                                          edges = edges,
+                                          directed = TRUE)
+  if (plot==TRUE) {
+    identifier_tidy %>% ggraph::ggraph() +
+      #  geom_edge_arc(colour = "gray") +
+      #ggraph::geom_edge_link(ggplot2::aes(colour = destination)) +
+      ggraph::geom_edge_link(colour = "gray") +
+      ggraph::geom_node_point(mapping = ggplot2::aes(color = type), show.legend = FALSE) +
+      ggraph::geom_node_text(ggplot2::aes(label = label), repel = TRUE) +
+      ggraph::theme_graph()
+  } else {
+    identifier_tidy
+  }
+}
