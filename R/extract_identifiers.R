@@ -18,7 +18,7 @@ nwd_extract_identifiers <- function(language = NULL,
   } else {
     homepage_folder <- fs::path("homepage")
   }
-
+  
   
   if (is.null(language)) {
     language <- fs::dir_ls(path = homepage_folder,
@@ -146,7 +146,7 @@ nwd_extract_identifiers_from_backup <- function(language,
                                  language = language,
                                  filetype = "html")
   }
-
+  
   if (googledrive==TRUE) {
     available_backups_on_google_drive <-
       nwd_list_available_backups_on_google_drive(folder = "homepage",
@@ -161,7 +161,7 @@ nwd_extract_identifiers_from_backup <- function(language,
   
   if (length(identifiers_done_dates)>0) {
     if (local == TRUE) {    
-      available_backups <- 
+      backup_homepages_not_processed <- 
         available_backups %>% 
         dplyr::filter(stringr::str_detect(string = name,
                                           pattern = paste(identifiers_done_dates,
@@ -185,7 +185,7 @@ nwd_extract_identifiers_from_backup <- function(language,
       backup_homepages_not_processed <- available_backups_on_google_drive
     }
   }
-
+  
   if (nrow(backup_homepages_not_processed)>0) {
     for (i in 1:nrow(backup_homepages_not_processed)) {
       fs::dir_create(path = "nwd_temp")
