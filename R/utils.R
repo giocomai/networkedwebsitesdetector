@@ -85,14 +85,41 @@ nwd_load_latest_identifiers_df <- function(language = NULL) {
 #' 
 #' @export
 #' 
-nwd_load_identifiers_df <- function(language = NULL) {
+nwd_load_identifiers_df <- function(language = NULL,
+                                    long = TRUE, 
+                                    store = TRUE,
+                                    cache = TRUE) {
   if (is.null(language)==TRUE) {
     language <- list.dirs(file.path("identifiers"), recursive = FALSE, full.names = FALSE)
   }
   base_path <- file.path("identifiers", language)
-  purrr::map_dfr(.x = fs::dir_ls(path = base_path, recurse = TRUE, type = "file", glob = "*.rds"),
-                 .f = readRDS, .id = "date") %>% 
+  
+  if (cache == TRUE & long==TRUE) {
+    fs::file_exists(path = fs::path("identifiers_long", language, "identifiers_df_long.rds"))
+  }
+  
+  identifiers_df <- purrr::map_dfr(.x = fs::dir_ls(path = base_path, recurse = TRUE, type = "file", glob = "*.rds"),
+                                   .f = readRDS, .id = "date") %>% 
     dplyr::mutate(date = as.Date(fs::path_file(fs::path_dir(date))))
+  if (long == TRUE) {
+    identifiers_df_long <- purrr::map_dfr(.x = colnames(identifiers_df)[!is.element(colnames(identifiers_df), c("date", "domain", "network_id"))],
+                                          .f = function (x) identifiers_df %>% 
+                                            dplyr::select(date, domain, x) %>% 
+                                            tidyr::unnest(cols = x) %>% 
+                                            dplyr::rename(id = x) %>% 
+                                            dplyr::transmute(date, domain, identifier = x, paste(x, id, sep = "_")) %>% 
+                                            dplyr::distinct() %>% 
+                                            tidyr::drop_na())
+    if (store == TRUE & long==TRUE) {
+      fs::dir_create(path = fs::path("identifiers_long", language), recurse = TRUE)
+      
+      saveRDS(object = identifiers_df_long,
+              file = fs::path("identifiers_long", language, "identifiers_df_long.rds"))
+    }
+    return(identifiers_df_long)
+  } else {
+    return(identifiers_df)
+  }
 }
 
 #' Check if there are unusually small or unusually big files

@@ -4,7 +4,8 @@
 \alias{nwd_load_identifiers_df}
 \title{Load all identifiers_df}
 \usage{
-nwd_load_identifiers_df(language = NULL)
+nwd_load_identifiers_df(language = NULL, long = TRUE, store = TRUE,
+  cache = TRUE)
 }
 \value{
 A data.frame (a tibble), made of data frames typically generated with `extract_identifiers()`
