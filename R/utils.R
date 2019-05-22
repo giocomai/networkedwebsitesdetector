@@ -124,3 +124,32 @@ nwd_clean_files <- function(min_size = 0,
   file_exceeding
 }
 
+
+#' List available backups
+#'
+#' @param language A character vector of language two letter codes. Defaults to NULL. If NULL, processes available languages.
+#' @return A tibble (a data frame) with three columns: name, date, location.
+#' @examples
+#' 
+#' @export
+
+nwd_list_available_backups <- function(date = NULL,
+                                       folder = "tweets",
+                                       timeframe = "daily",
+                                       language = NULL,
+                                       filetype = "rds") {
+
+  if (is.null(language)==TRUE) {
+    language <- fs::dir_ls(fs::path("archive")) %>% fs::path_file()
+  }
+  tibble::tibble(location =   purrr::map(.x = language,
+                                         .f = function (i) {
+                                           fs::dir_ls(path = fs::dir_ls(path = fs::path("archive", i)) %>%
+                                                        stringr::str_subset(pattern = folder),
+                                                      recurse = TRUE,
+                                                      type = "file",
+                                                      glob = paste0("*", i, "_", folder, "_", filetype, "_", timeframe, ".tar.gz"))
+                                         }) %>% unlist()) %>% 
+    dplyr::transmute(name = fs::path_file(location), date = as.Date(stringr::str_extract(string = location, pattern = "[[:digit:]][[:digit:]][[:digit:]][[:digit:]]-[[:digit:]][[:digit:]]-[[:digit:]][[:digit:]]")), location)
+
+}
