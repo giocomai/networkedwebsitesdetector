@@ -135,35 +135,68 @@ nwd_extract_identifiers <- function(language = NULL,
 #' @export
 #' 
 
-nwd_extract_identifiers_from_backup <- function(language) {
-  available_backups_on_google_drive <-
-    nwd_list_available_backups_on_google_drive(folder = "homepage",
-                                               timeframe = "daily",
-                                               language = language,
-                                               filetype = "html")
+nwd_extract_identifiers_from_backup <- function(language,
+                                                local = TRUE,
+                                                googledrive = FALSE) {
+  
+  if (local == TRUE) {
+    available_backups <-
+      nwd_list_available_backups(folder = "homepage",
+                                 timeframe = "daily",
+                                 language = language,
+                                 filetype = "html")
+  }
+
+  if (googledrive==TRUE) {
+    available_backups_on_google_drive <-
+      nwd_list_available_backups_on_google_drive(folder = "homepage",
+                                                 timeframe = "daily",
+                                                 language = language,
+                                                 filetype = "html")
+  }
   
   fs::dir_create(path = fs::path("identifiers", language), recurse = TRUE)
   identifiers_done_dates <- fs::dir_ls(path = fs::path("identifiers", language)) %>%
     fs::path_file()
   
   if (length(identifiers_done_dates)>0) {
-    backup_homepages_not_processed <- 
-      available_backups_on_google_drive %>% 
-      dplyr::filter(stringr::str_detect(string = name,
-                                        pattern = paste(identifiers_done_dates,
-                                                        collapse = "|"),
-                                        negate = TRUE))
+    if (local == TRUE) {    
+      available_backups <- 
+        available_backups %>% 
+        dplyr::filter(stringr::str_detect(string = name,
+                                          pattern = paste(identifiers_done_dates,
+                                                          collapse = "|"),
+                                          negate = TRUE))
+      
+      
+    } else if (googledrive == TRUE) {
+      backup_homepages_not_processed <- 
+        available_backups_on_google_drive %>% 
+        dplyr::filter(stringr::str_detect(string = name,
+                                          pattern = paste(identifiers_done_dates,
+                                                          collapse = "|"),
+                                          negate = TRUE))
+    } 
+    
   } else {
-    backup_homepages_not_processed <- available_backups_on_google_drive
+    if (local == TRUE) {  
+      backup_homepages_not_processed <- available_backups
+    } else if (googledrive == TRUE) {
+      backup_homepages_not_processed <- available_backups_on_google_drive
+    }
   }
 
   if (nrow(backup_homepages_not_processed)>0) {
     for (i in 1:nrow(backup_homepages_not_processed)) {
       fs::dir_create(path = "nwd_temp")
-      googledrive::drive_download(file = backup_homepages_not_processed %>%
-                                    dplyr::slice(i),
-                                  path = fs::path("nwd_temp", "temp.tar.gz"))
-      untar(tarfile = fs::path("nwd_temp", "temp.tar.gz"), exdir = "nwd_temp")
+      if (local == TRUE) { 
+        untar(tarfile = backup_homepages_not_processed$location[i], exdir = "nwd_temp")
+      } else if (googledrive == TRUE) {
+        googledrive::drive_download(file = backup_homepages_not_processed %>%
+                                      dplyr::slice(i),
+                                    path = fs::path("nwd_temp", "temp.tar.gz"))
+        untar(tarfile = fs::path("nwd_temp", "temp.tar.gz"), exdir = "nwd_temp")
+      }
       nwd_extract_identifiers(language = language, progress_bar = TRUE, temp = TRUE)
       fs::dir_delete(path = "nwd_temp")
     }
