@@ -7,6 +7,15 @@
 nwd_load_identifiers_df(language = NULL, long = TRUE, store = TRUE,
   cache = TRUE)
 }
+\arguments{
+\item{language}{A character vector of language two letter codes.}
+
+\item{long}{Logical, defaults to TRUE. If TRUE, returns a tidy data drame in the long format. If FALSE, return a wide dataframe with a column for each identifiers, and id included as lists.}
+
+\item{store}{Logical, defaults to TRUE. Should the output be stored locally as a dated file in the `identifiers_long/language` folder?}
+
+\item{cache}{Logical, defaults to TRUE. If already processed on the same date, should it just load the lastest stored files?}
+}
 \value{
 A data.frame (a tibble), made of data frames typically generated with `extract_identifiers()`
 }

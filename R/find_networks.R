@@ -1,5 +1,6 @@
 #' Find domains related to each across key identifiers
 #'
+#' @param identifiers_df A dataframe of indentifiers in the long format, typically created with `nwd_load_identifiers_df()`.
 #' @param language A character vector of language two letter codes. Defaults to NULL. If NULL, processes available languages.
 #' @param run_n Number of times to go through all identifiers. For example, if a new domain is found within the network through a common fb_app_id, it may be useful to see if the new domain has any ca_pub codes with others. 
 #' @return Nothing, used for its side effects. 
@@ -8,11 +9,27 @@
 #' @export
 
 
-nwd_find_related_domains <- function(domain,
-                                     identifiers_df = nwd_load_identifiers_df(),
-                                     identifiers = default_identifiers,
-                                     language = NULL,
-                                     run_n = 3) {
+nwd_find_network <- function(domain,
+                             identifiers_df = nwd_load_identifiers_df(),
+                             identifiers = NULL,
+                             language = NULL,
+                             max_run_n = 10) {
+  if (is.null(identifiers)) {
+    identifiers <- unique(identifiers_df$identifier)
+  }
+  
+  ## clean up
+  clean_up_id <- c(paste0("ua_", default_excluded_ua),
+                   paste0("fb_admins_", default_excluded_fb_admins),
+                   paste0("fb_app_id_", default_excluded_fb_app_id))
+  
+  identifiers_df <- identifiers_df %>% 
+    dplyr::mutate(id = dplyr::if_else(condition = id=="",
+                                      true = as.character(NA),
+                                      false = paste(identifier, id, sep = "_"))) %>% 
+    tidyr::drop_na() %>% 
+    dplyr::filter(!is.element(el = id, set = clean_up_id))
+  
   if (is.null(language)) {
     language <-  fs::dir_ls(path = fs::path("identifiers"),
                             recurse = FALSE,
@@ -23,91 +40,25 @@ nwd_find_related_domains <- function(domain,
   for (i in language) {
     temp_domains <- domain
     
-    for (j in rep(x = identifiers, run_n)) {
-      #message(i)
-      if (length(temp_domains)==0) {
-        temp_domains <- domain
-      }
-      temp <- identifiers_df %>% 
-        dplyr::filter(is.element(el = identifiers_df$domain, set = temp_domains))
-      
-      if (nrow(temp)==0) {
-        stop(paste("Domain", domain, "not available in archive"))
-      }
-      
-      temp_alt_id <-  temp %>% 
-        dplyr::select(domain, j) %>% 
-        tidyr::unnest() %>% 
-        dplyr::pull(j) %>%
-        base::unique() 
-      
-      ## clean up
-      if (j == "ua") {
-        temp_alt_id <- temp_alt_id[is.element(el = temp_alt_id, set = default_excluded_ua)==FALSE] 
-      }
-      if (j == "fb_admins") {
-        temp_alt_id <- temp_alt_id[is.element(el = temp_alt_id, set = default_excluded_fb_admins)==FALSE] 
-      }
-      if (j == "fb_app_id") {
-        temp_alt_id <- temp_alt_id[is.element(el = temp_alt_id, set = default_excluded_fb_app_id)==FALSE]
-      }
-      
-      
-      if (identical(x = "", y = temp_alt_id)) {
-        # do nothing
-      } else if (length(temp_alt_id)==0) {
-        # do nothing
-      } else {
-        temp_alt_id <- temp_alt_id[temp_alt_id!=""&is.na(temp_alt_id)==FALSE]
-        temp_domains_pre <- temp_domains
-        temp_domains_post <- c(temp_domains_pre, temp_domains_pre)
-        if (length(temp_alt_id)>0) {
-          while(length(temp_domains_pre)<length(temp_domains_post)) {
-            temp_domains_pre <- unique(temp_domains_post)
-            
-            # extract all id of given type present in subset
-            temp_alt <- identifiers_df %>% 
-              dplyr::filter(is.element(el = domain, set = temp_domains_pre)) %>% 
-              dplyr::select(domain, j) %>% 
-              tidyr::unnest() %>% 
-              dplyr::pull(j) %>%
-              base::unique()
-            
-            ## clean up
-            if (j == "ua") {
-              temp_alt <- temp_alt_id[is.element(el = temp_alt_id, set = default_excluded_ua)==FALSE] 
-            }
-            if (j == "fb_admins") {
-              temp_alt <- temp_alt_id[is.element(el = temp_alt_id, set = default_excluded_fb_admins)==FALSE] 
-            }
-            if (j == "fb_app_id") {
-              temp_alt <- temp_alt_id[is.element(el = temp_alt_id, set = default_excluded_fb_app_id)==FALSE]
-            }
-            
-            temp_alt <- temp_alt[temp_alt!=""&is.na(temp_alt)==FALSE]
-            
-            if (length(temp_alt)>0) {
-              temp_identifiers_df  <- identifiers_df %>% 
-                dplyr::select(domain, j) %>% 
-                tidyr::unnest()
-              
-              temp_identifiers_df <- temp_identifiers_df[temp_identifiers_df %>% dplyr::pull(j) %in% temp_alt, 1:2]
-              temp_domains_post <- temp_identifiers_df %>%
-                dplyr::distinct(domain) %>%
-                dplyr::pull(domain)
-            } else {
-              temp_domains_post <- temp_domains_pre
-            }
-            
-          }
-          
-        }
-        temp_domains <- c(unique(temp_domains_pre, temp_domains_post))
-      }
-      
+    post_identifier_df <- identifiers_df %>% 
+      dplyr::filter(is.element(el = domain, set = temp_domains))
+    
+    if (nrow(temp)==0) {
+      stop(paste("Domain", domain, "not available in archive"))
     }
+    pre <- nrow(post_identifier_df)
+    post <- nrow(post_identifier_df)+1
+    x <- 0
+    while (pre<post&x<max_run_n) {
+      pre <- nrow(post_identifier_df)
+      post_identifier_df <- identifiers_df %>% 
+        dplyr::filter(is.element(el = id, set = unique(post_identifier_df$id)))
+      post <- nrow(post_identifier_df)
+      x = x+1
+    }
+    post_identifier_df %>% 
+      dplyr::mutate(id = stringr::str_remove(string = id, pattern = paste0(identifier, "_"))) 
   }
-  temp_domains
 }
 
 #' Add a network_id column to identifiers_df
@@ -125,6 +76,17 @@ nwd_add_network_id <- function(identifiers_df = nwd_load_identifiers_df(),
                                temporary_files = NULL,
                                continue_from_temporary = FALSE) {
   
+  fs::dir_create(path = file.path("nwd_temp_identifiers", i), recurse = TRUE)
+  
+  if (is.null(identifiers)) {
+    identifiers <- unique(identifiers_df$identifier)
+  }
+  
+  identifiers_df <- identifiers_df %>% 
+    dplyr::mutate(id = dplyr::if_else(condition = is.na(id),
+                                      true = as.character(NA),
+                                      false = paste(identifier, id, sep = "_")))
+  
   if (is.null(language)) {
     language <-  fs::dir_ls(path = fs::path("identifiers"),
                             recurse = FALSE,
@@ -134,12 +96,14 @@ nwd_add_network_id <- function(identifiers_df = nwd_load_identifiers_df(),
   
   for (i in language) {
     if (continue_from_temporary==TRUE) {
-      temp_files <- fs::dir_ls(path = file.path("temp", "identifiers", i))
-      identifiers_df <- readRDS(file = temp_files[temp_files %>%
-                                                    stringr::str_extract(pattern = "[[:digit:]]+.rds") %>%
-                                                    stringr::str_remove(pattern = stringr::fixed(".rds")) %>%
-                                                    as.integer() %>%
-                                                    which.max()])
+      temp_files <- fs::dir_ls(path = fs::path("nwd_temp_identifiers", i), type = "file")
+      if (length(temp_files)>0) {
+        identifiers_df <- readRDS(file = temp_files[temp_files %>%
+                                                      stringr::str_extract(pattern = "[[:digit:]]+.rds") %>%
+                                                      stringr::str_remove(pattern = stringr::fixed(".rds")) %>%
+                                                      as.integer() %>%
+                                                      which.max()])
+      }
     }
     
     if (is.element(el = "network_id", set = colnames(identifiers_df))) {
@@ -152,16 +116,41 @@ nwd_add_network_id <- function(identifiers_df = nwd_load_identifiers_df(),
       store_when <- cumsum(rep(round(nrow(identifiers_df)/temporary_files), temporary_files))
     }
     
-    fs::dir_create(path = file.path("nwd_temp_identifiers", i), recurse = TRUE)
+    
+    if (is.element(el = "network_id", set = colnames(identifiers_df))) {
+      # do nothing
+    } else {
+      identifiers_df$network_id <- NA
+    }
+    
     pb <- dplyr::progress_estimated(n = nrow(identifiers_df), min_time = 1)
     for (j in 1:nrow(identifiers_df)) {
       pb$tick()$print()
       
+      
+      temp_identifier <- identifiers_df %>% 
+        dplyr::filter(domain == identifiers_df$domain[j])
+      
+      temp_network <- purrr::map_dfr(.x = temp_identifier$id,
+                                     .f = function(x) identifiers_df %>% 
+                                       dplyr::filter(id == x))
+      
+      identifiers_df$network_id[identifiers_df$domain %in% unique(temp_network$domain)] <- min(j, identifiers_df$network_id[identifiers_df$domain %in% unique(temp_network$domain)], na.rm = TRUE)
+      
+      
+      
       # TODO deal with data stored on different dates
-
+      
       if (is.na(identifiers_df$network_id[j])) {
-        related_domains <- nwd_find_related_domains(domain = identifiers_df$domain[j], identifiers_df = identifiers_df, identifiers = colnames(identifiers_df)[-2:-1])
-        identifiers_df$network_id[identifiers_df$domain %in% related_domains] <- min(j, identifiers_df$network_id[identifiers_df$domain %in% related_domains], na.rm = TRUE)
+        
+        related_domains <- nwd_find_related_domains(domain = identifiers_df$domain[j],
+                                                    identifiers_df = identifiers_df,
+                                                    identifiers = identifiers)
+        
+        identifiers_df$network_id[identifiers_df$domain %in% related_domains] <- min(j,
+                                                                                     identifiers_df$network_id[identifiers_df$domain %in% related_domains],
+                                                                                     na.rm = TRUE)
+        
         if (is.null(temporary_files)==FALSE) {
           if (is.element(j, store_when)) {
             saveRDS(object = identifiers_df,
@@ -197,8 +186,8 @@ nwd_add_network_id <- function(identifiers_df = nwd_load_identifiers_df(),
 #' 
 
 nwd_create_domain_graph_all_connections <- function(domains,
-                                                identifiers_df = nwd_load_identifiers_df(),
-                                                identifiers = default_identifiers) {
+                                                    identifiers_df = nwd_load_identifiers_df(),
+                                                    identifiers = default_identifiers) {
   temp_identifiers_df <- identifiers_df %>% 
     dplyr::filter(is.element(el = domain, set = domains)) 
   
@@ -246,10 +235,10 @@ nwd_create_domain_graph_all_connections <- function(domains,
 #' 
 
 nwd_create_domain_graph_identifiers <- function(domains,
-                                            identifiers_df = nwd_load_identifiers_df(),
-                                            identifiers = networkedwebsitesdetector::default_identifiers,
-                                            only_shared_identifiers = TRUE, 
-                                            plot = TRUE) {
+                                                identifiers_df = nwd_load_identifiers_df(),
+                                                identifiers = networkedwebsitesdetector::default_identifiers,
+                                                only_shared_identifiers = TRUE, 
+                                                plot = TRUE) {
   if (length(domains)==1) {
     domains <- nwd_find_related_domains(domain = domains)
   }

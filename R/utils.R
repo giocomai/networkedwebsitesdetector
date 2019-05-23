@@ -64,6 +64,7 @@ nwd_check_if_exists <- function(domain,
 
 #' Load latest identifiers_df
 #'
+#' @param language A character vector of language two letter codes.
 #' @return A data.frame (a tibble), typically generated with `extract_identifiers()`
 #' @examples
 #' 
@@ -72,14 +73,18 @@ nwd_check_if_exists <- function(domain,
 
 nwd_load_latest_identifiers_df <- function(language = NULL) {
   if (is.null(language)==TRUE) {
-    language <- list.dirs(file.path("identifiers"), recursive = FALSE, full.names = FALSE)
+    language <- list.dirs(file.path("identifiers_long"), recursive = FALSE, full.names = FALSE)
   }
-  base_path <- file.path("identifiers", language)
-  readRDS(file = fs::dir_ls(fs::dir_ls(path = base_path) %>% tail(1)))
+  base_path <- file.path("identifiers_long", language)
+  readRDS(file = fs::dir_ls(fs::dir_ls(path = base_path, type = "file") %>% tail(1)))
 }
 
 #' Load all identifiers_df
 #'
+#' @param language A character vector of language two letter codes. 
+#' @param long Logical, defaults to TRUE. If TRUE, returns a tidy data drame in the long format. If FALSE, return a wide dataframe with a column for each identifiers, and id included as lists. 
+#' @param store Logical, defaults to TRUE. Should the output be stored locally as a dated file in the `identifiers_long/language` folder?
+#' @param cache Logical, defaults to TRUE. If already processed on the same date, should it just load the lastest stored files?
 #' @return A data.frame (a tibble), made of data frames typically generated with `extract_identifiers()`
 #' @examples
 #' 

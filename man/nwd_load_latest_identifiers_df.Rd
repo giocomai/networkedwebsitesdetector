@@ -6,6 +6,9 @@
 \usage{
 nwd_load_latest_identifiers_df(language = NULL)
 }
+\arguments{
+\item{language}{A character vector of language two letter codes.}
+}
 \value{
 A data.frame (a tibble), typically generated with `extract_identifiers()`
 }
