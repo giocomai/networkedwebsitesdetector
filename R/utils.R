@@ -95,7 +95,7 @@ nwd_load_identifiers_df <- function(language = NULL,
   base_path <- file.path("identifiers", language)
   
   if (cache == TRUE & long==TRUE) {
-    fs::file_exists(path = fs::path("identifiers_long", language, "identifiers_df_long.rds"))
+    fs::file_exists(path = fs::path("identifiers_long", language, paste0(Sys.Date(), "_identifiers_df_long.rds")))
   }
   
   identifiers_df <- purrr::map_dfr(.x = fs::dir_ls(path = base_path, recurse = TRUE, type = "file", glob = "*.rds"),
@@ -114,7 +114,7 @@ nwd_load_identifiers_df <- function(language = NULL,
       fs::dir_create(path = fs::path("identifiers_long", language), recurse = TRUE)
       
       saveRDS(object = identifiers_df_long,
-              file = fs::path("identifiers_long", language, "identifiers_df_long.rds"))
+              file = fs::path("identifiers_long", language, paste0(Sys.Date(), "_identifiers_df_long.rds")))
     }
     return(identifiers_df_long)
   } else {
