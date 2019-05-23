@@ -43,7 +43,7 @@ nwd_find_network <- function(domain,
     post_identifier_df <- identifiers_df %>% 
       dplyr::filter(is.element(el = domain, set = temp_domains))
     
-    if (nrow(temp)==0) {
+    if (nrow(post_identifier_df)==0) {
       stop(paste("Domain", domain, "not available in archive"))
     }
     pre <- nrow(post_identifier_df)
@@ -56,8 +56,8 @@ nwd_find_network <- function(domain,
       post <- nrow(post_identifier_df)
       x = x+1
     }
-    post_identifier_df %>% 
-      dplyr::mutate(id = stringr::str_remove(string = id, pattern = paste0(identifier, "_"))) 
+    return(post_identifier_df %>% 
+      dplyr::mutate(id = stringr::str_remove(string = id, pattern = paste0(identifier, "_"))))
   }
 }
 
@@ -76,17 +76,10 @@ nwd_add_network_id <- function(identifiers_df = nwd_load_identifiers_df(),
                                temporary_files = NULL,
                                continue_from_temporary = FALSE) {
   
-  fs::dir_create(path = file.path("nwd_temp_identifiers", i), recurse = TRUE)
-  
   if (is.null(identifiers)) {
     identifiers <- unique(identifiers_df$identifier)
   }
-  
-  identifiers_df <- identifiers_df %>% 
-    dplyr::mutate(id = dplyr::if_else(condition = is.na(id),
-                                      true = as.character(NA),
-                                      false = paste(identifier, id, sep = "_")))
-  
+
   if (is.null(language)) {
     language <-  fs::dir_ls(path = fs::path("identifiers"),
                             recurse = FALSE,
@@ -95,6 +88,7 @@ nwd_add_network_id <- function(identifiers_df = nwd_load_identifiers_df(),
   }
   
   for (i in language) {
+    fs::dir_create(path = file.path("nwd_temp_identifiers", i), recurse = TRUE)
     if (continue_from_temporary==TRUE) {
       temp_files <- fs::dir_ls(path = fs::path("nwd_temp_identifiers", i), type = "file")
       if (length(temp_files)>0) {
@@ -116,17 +110,11 @@ nwd_add_network_id <- function(identifiers_df = nwd_load_identifiers_df(),
       store_when <- cumsum(rep(round(nrow(identifiers_df)/temporary_files), temporary_files))
     }
     
-    
-    if (is.element(el = "network_id", set = colnames(identifiers_df))) {
-      # do nothing
-    } else {
-      identifiers_df$network_id <- NA
-    }
-    
     pb <- dplyr::progress_estimated(n = nrow(identifiers_df), min_time = 1)
-    for (j in 1:nrow(identifiers_df)) {
+    for (j in unique(identifiers_df$domain)) {
       pb$tick()$print()
       
+      nwd_find_network(domain = j, identifiers_df = identifiers_df)
       
       temp_identifier <- identifiers_df %>% 
         dplyr::filter(domain == identifiers_df$domain[j])
