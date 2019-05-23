@@ -5,7 +5,7 @@
 \title{Add a network_id column to identifiers_df}
 \usage{
 nwd_add_network_id(identifiers_df = nwd_load_identifiers_df(),
-  language = NULL, temporary_files = NULL,
+  language = NULL, identifiers = NULL, temporary_files = NULL,
   continue_from_temporary = FALSE)
 }
 \arguments{

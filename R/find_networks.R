@@ -18,17 +18,20 @@ nwd_find_network <- function(domain,
     identifiers <- unique(identifiers_df$identifier)
   }
   
+  
+  identifiers_df$network_id <- NULL
+  identifiers_df <- identifiers_df %>% 
+    dplyr::mutate(id = dplyr::if_else(condition = id=="",
+                                      true = as.character(NA),
+                                      false = paste(identifier, id, sep = "_"))) %>% 
+    tidyr::drop_na() 
+  
   ## clean up
   clean_up_id <- c(paste0("ua_", default_excluded_ua),
                    paste0("fb_admins_", default_excluded_fb_admins),
                    paste0("fb_app_id_", default_excluded_fb_app_id))
   
-  identifiers_df <- identifiers_df %>% 
-    dplyr::mutate(id = dplyr::if_else(condition = id=="",
-                                      true = as.character(NA),
-                                      false = paste(identifier, id, sep = "_"))) %>% 
-    tidyr::drop_na() %>% 
-    dplyr::filter(!is.element(el = id, set = clean_up_id))
+  identifiers_df$id[is.element(el = identifiers_df$id, set = clean_up_id)] <- NA
   
   if (is.null(language)) {
     language <-  fs::dir_ls(path = fs::path("identifiers"),
@@ -57,7 +60,7 @@ nwd_find_network <- function(domain,
       x = x+1
     }
     return(post_identifier_df %>% 
-      dplyr::mutate(id = stringr::str_remove(string = id, pattern = paste0(identifier, "_"))))
+             dplyr::mutate(id = stringr::str_remove(string = id, pattern = paste0(identifier, "_"))))
   }
 }
 
@@ -73,13 +76,14 @@ nwd_find_network <- function(domain,
 #' 
 nwd_add_network_id <- function(identifiers_df = nwd_load_identifiers_df(),
                                language = NULL, 
+                               identifiers = NULL,
                                temporary_files = NULL,
                                continue_from_temporary = FALSE) {
   
   if (is.null(identifiers)) {
     identifiers <- unique(identifiers_df$identifier)
   }
-
+  
   if (is.null(language)) {
     language <-  fs::dir_ls(path = fs::path("identifiers"),
                             recurse = FALSE,
@@ -111,54 +115,33 @@ nwd_add_network_id <- function(identifiers_df = nwd_load_identifiers_df(),
     }
     
     pb <- dplyr::progress_estimated(n = nrow(identifiers_df), min_time = 1)
-    for (j in unique(identifiers_df$domain)) {
+    for (j in seq_along(identifiers_df$domain)) {
       pb$tick()$print()
       
-      nwd_find_network(domain = j, identifiers_df = identifiers_df)
-      
-      temp_identifier <- identifiers_df %>% 
-        dplyr::filter(domain == identifiers_df$domain[j])
-      
-      temp_network <- purrr::map_dfr(.x = temp_identifier$id,
-                                     .f = function(x) identifiers_df %>% 
-                                       dplyr::filter(id == x))
-      
-      identifiers_df$network_id[identifiers_df$domain %in% unique(temp_network$domain)] <- min(j, identifiers_df$network_id[identifiers_df$domain %in% unique(temp_network$domain)], na.rm = TRUE)
-      
-      
-      
-      # TODO deal with data stored on different dates
-      
-      if (is.na(identifiers_df$network_id[j])) {
+      if (is.na(identifiers_df$network_id[j])==TRUE) {
+        full_network <- nwd_find_network(domain = identifiers_df$domain[j], identifiers_df = identifiers_df)
         
-        related_domains <- nwd_find_related_domains(domain = identifiers_df$domain[j],
-                                                    identifiers_df = identifiers_df,
-                                                    identifiers = identifiers)
+        identifiers_df$network_id[identifiers_df$domain %in% unique(full_network$domain)] <- min(j, identifiers_df$network_id[identifiers_df$domain %in% unique(full_network$domain)], na.rm = TRUE)
         
-        identifiers_df$network_id[identifiers_df$domain %in% related_domains] <- min(j,
-                                                                                     identifiers_df$network_id[identifiers_df$domain %in% related_domains],
-                                                                                     na.rm = TRUE)
-        
-        if (is.null(temporary_files)==FALSE) {
-          if (is.element(j, store_when)) {
-            saveRDS(object = identifiers_df,
-                    file = file.path("nwd_temp_identifiers", i, paste0("network_df-", j, ".rds")))
-            message(paste("\nTemporary files stored after processing", j, "lines"))
-          }
-          
+      }
+      if (is.null(temporary_files)==FALSE) {
+        if (is.element(j, store_when)) {
+          saveRDS(object = identifiers_df,
+                  file = file.path("nwd_temp_identifiers", i, paste0("network_df-", j, ".rds")))
+          message(paste("\nTemporary files stored after processing", j, "lines"))
         }
       }
     }
-    fs::dir_create(path = fs::path("network_df", i), recurse = TRUE)
-    saveRDS(object = identifiers_df,
-            file = fs::path("network_df",
-                            i,
-                            paste0(Sys.Date(),
-                                   "_",
-                                   i, 
-                                   "network_df.rds")))
-    return(identifiers_df)
   }
+  fs::dir_create(path = fs::path("network_df", i), recurse = TRUE)
+  saveRDS(object = identifiers_df,
+          file = fs::path("network_df",
+                          i,
+                          paste0(Sys.Date(),
+                                 "_",
+                                 i, 
+                                 "_network_df.rds")))
+  return(identifiers_df)
 }
 
 
