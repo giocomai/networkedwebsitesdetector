@@ -108,7 +108,7 @@ nwd_load_identifiers_df <- function(language = NULL,
                                             dplyr::select(date, domain, x) %>% 
                                             tidyr::unnest(cols = x) %>% 
                                             dplyr::rename(id = x) %>% 
-                                            dplyr::transmute(date, domain, identifier = x, paste(x, id, sep = "_")) %>% 
+                                            dplyr::transmute(date, domain, identifier = x, id) %>% 
                                             dplyr::distinct() %>% 
                                             tidyr::drop_na())
     if (store == TRUE & long==TRUE) {
