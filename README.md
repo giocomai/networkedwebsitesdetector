@@ -17,3 +17,12 @@ You can install the released version of networkedwebsitesdetector from
 ``` r
 remotes::install_github("giocomai/networkedwebsitesdetector")
 ```
+
+As of this writing (2019-05-24), the package works with the development
+versions of both `tidyr` and `googledrive` and will result in errors
+with the current cran versions.
+
+``` r
+remotes::install_github("tidyverse/tidyr")
+remotes::install_github("tidyverse/googledrive")
+```
