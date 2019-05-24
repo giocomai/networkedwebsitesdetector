@@ -109,20 +109,26 @@ nwd_load_identifiers_df <- function(language = NULL,
     dplyr::mutate(date = as.Date(fs::path_file(fs::path_dir(date))))
   if (long == TRUE) {
     identifiers_df_long <- purrr::map_dfr(.x = colnames(identifiers_df)[!is.element(colnames(identifiers_df), c("date", "domain", "network_id"))],
-                                          .f = function (x) identifiers_df %>% 
-                                            dplyr::select(date, domain, x) %>% 
-                                            tidyr::unnest(cols = x) %>% 
-                                            dplyr::rename(id = x) %>% 
-                                            dplyr::transmute(date, domain, identifier = x, id) %>% 
-                                            dplyr::distinct() %>% 
-                                            tidyr::drop_na())
-    if (store == TRUE & long==TRUE) {
-      fs::dir_create(path = fs::path("identifiers_long", language), recurse = TRUE)
-      
-      saveRDS(object = identifiers_df_long,
-              file = today_identifiers_df_long_location)
-    }
-    return(identifiers_df_long)
+                                          .f = function (x) {
+                                            temp <- identifiers_df %>% 
+                                              dplyr::select(date, domain, x) %>% 
+                                              tidyr::unnest(cols = x, keep_empty = TRUE)
+                                            # FIX remove if when tidyr bug resolved
+                                            if (ncol(temp)>2) {
+                                              temp %>%
+                                                dplyr::rename(id = x) %>% 
+                                                dplyr::transmute(date, domain, identifier = x, id) %>% 
+                                                dplyr::distinct() %>% 
+                                                tidyr::drop_na()
+                                            }
+                                          })
+                                          if (store == TRUE & long==TRUE) {
+                                            fs::dir_create(path = fs::path("identifiers_long", language), recurse = TRUE)
+                                            
+                                            saveRDS(object = identifiers_df_long,
+                                                    file = today_identifiers_df_long_location)
+                                          }
+                                          return(identifiers_df_long)
   } else {
     return(identifiers_df)
   }
@@ -171,7 +177,7 @@ nwd_list_available_backups <- function(date = NULL,
                                        timeframe = "daily",
                                        language = NULL,
                                        filetype = "rds") {
-
+  
   if (is.null(language)==TRUE) {
     language <- fs::dir_ls(fs::path("archive")) %>% fs::path_file()
   }
@@ -184,5 +190,5 @@ nwd_list_available_backups <- function(date = NULL,
                                                       glob = paste0("*", i, "_", folder, "_", filetype, "_", timeframe, ".tar.gz"))
                                          }) %>% unlist()) %>% 
     dplyr::transmute(name = fs::path_file(location), date = as.Date(stringr::str_extract(string = location, pattern = "[[:digit:]][[:digit:]][[:digit:]][[:digit:]]-[[:digit:]][[:digit:]]-[[:digit:]][[:digit:]]")), location)
-
+  
 }
