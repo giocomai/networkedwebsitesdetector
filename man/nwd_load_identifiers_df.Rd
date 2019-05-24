@@ -5,7 +5,7 @@
 \title{Load all identifiers_df}
 \usage{
 nwd_load_identifiers_df(language = NULL, long = TRUE, store = TRUE,
-  cache = TRUE)
+  cache = TRUE, keep_duplicates = FALSE)
 }
 \arguments{
 \item{language}{A character vector of language two letter codes.}
@@ -15,6 +15,8 @@ nwd_load_identifiers_df(language = NULL, long = TRUE, store = TRUE,
 \item{store}{Logical, defaults to TRUE. Should the output be stored locally as a dated file in the `identifiers_long/language` folder?}
 
 \item{cache}{Logical, defaults to TRUE. If already processed on the same date, should it just load the lastest stored files?}
+
+\item{keep_duplicates}{Logical, defaults to FALSE. If FALSE, if the same web page has been downloaded on multiple dates, it keeps only the first instance when a given identifier was found. If TRUE, it keeps one row per available date.}
 }
 \value{
 A data.frame (a tibble), made of data frames typically generated with `extract_identifiers()`

@@ -85,6 +85,7 @@ nwd_load_latest_identifiers_df <- function(language = NULL) {
 #' @param long Logical, defaults to TRUE. If TRUE, returns a tidy data drame in the long format. If FALSE, return a wide dataframe with a column for each identifiers, and id included as lists. 
 #' @param store Logical, defaults to TRUE. Should the output be stored locally as a dated file in the `identifiers_long/language` folder?
 #' @param cache Logical, defaults to TRUE. If already processed on the same date, should it just load the lastest stored files?
+#' @param keep_duplicates Logical, defaults to FALSE. If FALSE, if the same web page has been downloaded on multiple dates, it keeps only the first instance when a given identifier was found. If TRUE, it keeps one row per available date.
 #' @return A data.frame (a tibble), made of data frames typically generated with `extract_identifiers()`
 #' @examples
 #' 
@@ -93,7 +94,8 @@ nwd_load_latest_identifiers_df <- function(language = NULL) {
 nwd_load_identifiers_df <- function(language = NULL,
                                     long = TRUE, 
                                     store = TRUE,
-                                    cache = TRUE) {
+                                    cache = TRUE,
+                                    keep_duplicates = FALSE) {
   if (is.null(language)==TRUE) {
     language <- list.dirs(file.path("identifiers"), recursive = FALSE, full.names = FALSE)
   }
@@ -121,14 +123,19 @@ nwd_load_identifiers_df <- function(language = NULL,
                                                 dplyr::distinct() %>% 
                                                 tidyr::drop_na()
                                             }
-                                          })
-                                          if (store == TRUE & long==TRUE) {
-                                            fs::dir_create(path = fs::path("identifiers_long", language), recurse = TRUE)
-                                            
-                                            saveRDS(object = identifiers_df_long,
-                                                    file = today_identifiers_df_long_location)
-                                          }
-                                          return(identifiers_df_long)
+                                          }) %>% 
+      dplyr::arrange(date, domain, identifier, id)
+    if (keep_duplicates==FALSE) {
+      identifiers_df_long <- identifiers_df_long %>% 
+        dplyr::distinct(domain, identifier, id, .keep_all = TRUE)
+    }
+    if (store == TRUE & long==TRUE) {
+      fs::dir_create(path = fs::path("identifiers_long", language), recurse = TRUE)
+      
+      saveRDS(object = identifiers_df_long,
+              file = today_identifiers_df_long_location)
+    }
+    return(identifiers_df_long)
   } else {
     return(identifiers_df)
   }
