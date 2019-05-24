@@ -47,7 +47,7 @@ nwd_find_network <- function(domain,
       dplyr::filter(is.element(el = domain, set = temp_domains))
     
     if (nrow(post_identifier_df)==0) {
-      stop(paste("Domain", domain, "not available in archive"))
+      warning(paste("Domain", domain, "not available in archive"))
     }
     pre <- nrow(post_identifier_df)
     post <- nrow(post_identifier_df)+1
