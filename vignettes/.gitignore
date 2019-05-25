@@ -1,0 +1,12 @@
+*.html
+*.R
+.build.timestamp
+domains
+identifiers
+identifiers_long
+keywords
+network_df
+tweets
+tweet_links
+emm_newsbrief
+homepage_failed

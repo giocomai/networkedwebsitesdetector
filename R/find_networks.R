@@ -27,9 +27,9 @@ nwd_find_network <- function(domain,
     tidyr::drop_na() 
   
   ## clean up
-  clean_up_id <- c(paste0("ua_", default_excluded_ua),
-                   paste0("fb_admins_", default_excluded_fb_admins),
-                   paste0("fb_app_id_", default_excluded_fb_app_id))
+  clean_up_id <- c(paste0("ua_", default_excluded_ua$id),
+                   paste0("fb_admins_", default_excluded_fb_admins$id),
+                   paste0("fb_app_id_", default_excluded_fb_app_id$id))
   
   identifiers_df$id[is.element(el = identifiers_df$id, set = clean_up_id)] <- NA
   
