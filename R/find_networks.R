@@ -20,6 +20,8 @@ nwd_find_network <- function(domain,
   
   
   identifiers_df$network_id <- NULL
+  
+  
   identifiers_df <- identifiers_df %>% 
     dplyr::mutate(id = dplyr::if_else(condition = id=="",
                                       true = as.character(NA),
@@ -32,6 +34,9 @@ nwd_find_network <- function(domain,
                    paste0("fb_app_id_", default_excluded_fb_app_id$id))
   
   identifiers_df$id[is.element(el = identifiers_df$id, set = clean_up_id)] <- NA
+  
+  identifiers_df <- identifiers_df %>%
+    tidyr::drop_na() 
   
   if (is.null(language)) {
     language <-  fs::dir_ls(path = fs::path("identifiers"),
@@ -121,7 +126,11 @@ nwd_add_network_id <- function(identifiers_df = nwd_load_identifiers_df(),
       if (is.na(identifiers_df$network_id[j])==TRUE) {
         full_network <- nwd_find_network(domain = identifiers_df$domain[j], identifiers_df = identifiers_df)
         
-        identifiers_df$network_id[identifiers_df$domain %in% unique(full_network$domain)] <- min(j, identifiers_df$network_id[identifiers_df$domain %in% unique(full_network$domain)], na.rm = TRUE)
+        if (nrow(full_network)>0) {
+          identifiers_df$network_id[identifiers_df$domain %in% unique(full_network$domain)] <- min(j, identifiers_df$network_id[identifiers_df$domain %in% unique(full_network$domain)], na.rm = TRUE)
+        } else {
+          identifiers_df$network_id[identifiers_df$domain==identifiers_df$domain[j]] <- j
+        }
         
       }
       if (is.null(temporary_files)==FALSE) {
