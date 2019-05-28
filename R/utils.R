@@ -105,13 +105,22 @@ nwd_load_identifiers_df <- function(language = NULL,
   if (cache == TRUE & long==TRUE & fs::file_exists(path = today_identifiers_df_long_location)) {
     return(readRDS(file = today_identifiers_df_long_location))
   }
-  
-  identifiers_df <- purrr::map_dfr(.x = fs::dir_ls(path = base_path, recurse = TRUE, type = "file", glob = "*.rds"),
-                                   .f = readRDS, .id = "date") %>% 
+  file_list <- fs::dir_ls(path = base_path, recurse = TRUE, type = "file", glob = "*.rds")
+  message("Step 1: Load identifiers\n")
+  pb <- dplyr::progress_estimated(length(file_list))
+  identifiers_df <- purrr::map_dfr(.x = file_list,
+                                   .f = function (x) {
+                                     pb$tick()$print()
+                                     readRDS(file = x)
+                                     }, .id = "date") %>% 
     dplyr::mutate(date = as.Date(fs::path_file(fs::path_dir(date))))
   if (long == TRUE) {
-    identifiers_df_long <- purrr::map_dfr(.x = colnames(identifiers_df)[!is.element(colnames(identifiers_df), c("date", "domain", "network_id"))],
+    message("\nStep 2: Convert into long data frame\n")
+    identifiers_to_process <- colnames(identifiers_df)[!is.element(colnames(identifiers_df), c("date", "domain", "network_id"))]
+    pb <- dplyr::progress_estimated(length(identifiers_to_process))
+    identifiers_df_long <- purrr::map_dfr(.x = identifiers_to_process,
                                           .f = function (x) {
+                                            pb$tick()$print()
                                             temp <- identifiers_df %>% 
                                               dplyr::select(date, domain, x) %>% 
                                               tidyr::unnest(cols = x, keep_empty = TRUE)
