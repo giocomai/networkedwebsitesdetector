@@ -98,7 +98,8 @@ nwd_restore <- function(date = NULL,
                         folder = "tweets",
                         timeframe = "daily",
                         language = NULL,
-                        filetype = "rds") {
+                        filetype = "rds", 
+                        filenames_only = FALSE) {
   
   if (is.null(language)) {
     language <-  fs::dir_ls(path = fs::path("archive"),
@@ -129,11 +130,18 @@ nwd_restore <- function(date = NULL,
                                                           "_", 
                                                           timeframe, ".tar.gz"))
     
-    
-    purrr::walk(.x = archived_files_location_l,
-                .f = function (x) {
-                  untar(tarfile = x)
-                })
+    if (filenames_only==FALSE) {
+      purrr::walk(.x = archived_files_location_l,
+                  .f = function (x) {
+                    untar(tarfile = x)
+                  })
+    } else {
+      return(purrr::map(.x = archived_files_location_l,
+                 .f = function (x) {
+                   untar(tarfile = x, list = TRUE)
+                 }) %>% unlist())
+    }
+
   }
   
 }
