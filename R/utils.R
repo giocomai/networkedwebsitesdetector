@@ -113,7 +113,9 @@ nwd_load_identifiers_df <- function(language = NULL,
                                      pb$tick()$print()
                                      readRDS(file = x)
                                      }, .id = "date") %>% 
-    dplyr::mutate(date = as.Date(fs::path_file(fs::path_dir(date))))
+    dplyr::mutate(date = as.Date(fs::path_file(fs::path_dir(date)))) %>% 
+    dplyr::mutate(domain = stringr::str_remove(string = domain, pattern = "^www\\."))
+  
   if (long == TRUE) {
     message("\nStep 2: Convert into long data frame\n")
     identifiers_to_process <- colnames(identifiers_df)[!is.element(colnames(identifiers_df), c("date", "domain", "network_id"))]
@@ -134,6 +136,7 @@ nwd_load_identifiers_df <- function(language = NULL,
                                             }
                                           }) %>% 
       dplyr::arrange(date, domain, identifier, id)
+    
     if (keep_duplicates==FALSE) {
       identifiers_df_long <- identifiers_df_long %>% 
         dplyr::distinct(domain, identifier, id, .keep_all = TRUE)
