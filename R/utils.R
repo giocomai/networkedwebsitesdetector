@@ -76,7 +76,7 @@ nwd_load_latest_identifiers_df <- function(language = NULL) {
     language <- list.dirs(file.path("identifiers_long"), recursive = FALSE, full.names = FALSE)
   }
   base_path <- file.path("identifiers_long", language)
-  readRDS(file = fs::dir_ls(fs::dir_ls(path = base_path, type = "file") %>% tail(1)))
+  readRDS(file = fs::dir_ls(path = base_path, type = "file") %>% tail(1))
 }
 
 #' Load all identifiers_df
