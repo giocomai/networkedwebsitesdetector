@@ -18,9 +18,7 @@ nwd_find_network <- function(domain,
     identifiers <- unique(identifiers_df$identifier)
   }
   
-  
   identifiers_df$network_id <- NULL
-  
   
   identifiers_df <- identifiers_df %>% 
     dplyr::mutate(id = dplyr::if_else(condition = id=="",
@@ -29,6 +27,7 @@ nwd_find_network <- function(domain,
     tidyr::drop_na() 
   
   ## clean up
+  # TODO allow customisation
   clean_up_id <- c(paste0("ua_", default_excluded_ua$id),
                    paste0("fb_admins_", default_excluded_fb_admins$id),
                    paste0("fb_app_id_", default_excluded_fb_app_id$id))
@@ -60,7 +59,9 @@ nwd_find_network <- function(domain,
     while (pre<post&x<max_run_n) {
       pre <- nrow(post_identifier_df)
       post_identifier_df <- identifiers_df %>% 
-        dplyr::filter(is.element(el = id, set = unique(post_identifier_df$id)))
+        dplyr::filter(is.element(el = id,
+                                 set = unique(post_identifier_df$id))|is.element(el = domain,
+                                                                                 set = unique(post_identifier_df$domain)))
       post <- nrow(post_identifier_df)
       x = x+1
     }
@@ -214,25 +215,24 @@ nwd_create_domain_graph_all_connections <- function(domains,
 #' 
 #' 
 
-nwd_create_domain_graph_identifiers <- function(domains,
+nwd_create_domain_graph_identifiers <- function(network,
                                                 identifiers_df = nwd_load_identifiers_df(),
-                                                identifiers = networkedwebsitesdetector::default_identifiers,
+                                                identifiers = NULL,
                                                 only_shared_identifiers = TRUE, 
                                                 plot = TRUE) {
-  if (length(domains)==1) {
-    domains <- nwd_find_related_domains(domain = domains)
+  if (is.character(network) == TRUE & length(network)==1) {
+    network <- nwd_find_network(domain = network,
+                                identifiers_df = identifiers_df,
+                                identifiers = identifiers)
   }
   
-  temp_identifiers_df <- identifiers_df %>% 
-    dplyr::filter(is.element(el = domain, set = domains)) 
-  
-  
-  all_connections <- purrr::map_dfr(.x = identifiers, .f = function(x) temp_identifiers_df %>% 
-                                      dplyr::select(domain, x) %>% 
-                                      tidyr::unnest() %>% 
-                                      dplyr::distinct() %>% 
-                                      magrittr::set_colnames(c("domain", "identifier")) %>% 
-                                      dplyr::transmute(source = domain, destination = identifier)) %>% 
+  if (is.null(identifiers)) {
+    identifiers <- unique(domains$identifier)
+  }
+
+  all_connections <- network %>% 
+    dplyr::transmute(source = domain, destination = paste0(identifier, ": ", id)) %>% 
+    dplyr::distinct() %>% 
     dplyr::group_by(destination) %>% 
     dplyr::add_count() %>% 
     dplyr::ungroup()
@@ -240,13 +240,13 @@ nwd_create_domain_graph_identifiers <- function(domains,
   if (only_shared_identifiers==TRUE) {
     all_connections <- all_connections %>% 
       dplyr::filter(n>1)
-    
   }
   
   
   nodes <- dplyr::bind_rows(domains = all_connections %>% 
                               dplyr::distinct(source) %>% 
                               dplyr::rename(label = source),
+                            
                             identifiers = all_connections %>% 
                               dplyr::distinct(destination)%>% 
                               dplyr::rename(label = destination), .id = "type") %>% 

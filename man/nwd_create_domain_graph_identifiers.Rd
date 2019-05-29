@@ -4,9 +4,8 @@
 \alias{nwd_create_domain_graph_identifiers}
 \title{Create a graph of the network of one or more domains}
 \usage{
-nwd_create_domain_graph_identifiers(domains,
-  identifiers_df = nwd_load_identifiers_df(),
-  identifiers = networkedwebsitesdetector::default_identifiers,
+nwd_create_domain_graph_identifiers(network,
+  identifiers_df = nwd_load_identifiers_df(), identifiers = NULL,
   only_shared_identifiers = TRUE, plot = TRUE)
 }
 \arguments{
