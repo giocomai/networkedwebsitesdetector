@@ -107,18 +107,38 @@ nwd_load_identifiers_df <- function(language = NULL,
     return(readRDS(file = today_identifiers_df_long_location))
   }
   file_list <- fs::dir_ls(path = base_path, recurse = TRUE, type = "file", glob = "*.rds")
-  message("Step 1: Load identifiers\n")
+  message("Load identifiers\n")
   pb <- dplyr::progress_estimated(length(file_list))
   identifiers_df <- purrr::map_dfr(.x = file_list,
                                    .f = function (x) {
                                      pb$tick()$print()
                                      readRDS(file = x)
-                                     }, .id = "date") %>% 
+                                   }, .id = "date") %>% 
     dplyr::mutate(date = as.Date(fs::path_file(fs::path_dir(date)))) %>% 
     dplyr::mutate(domain = stringr::str_remove(string = domain, pattern = "^www\\."))
   
+  if (top_domain_only == TRUE) {
+    message("\nRemove subdomains\n")
+    
+    # TODO get top_domain_only to work
+    networkedwebsitesdetector::public_suffix_list %>% 
+      dplyr::mutate(n_dot = stringr::str_count(string = list, pattern = stringr::fixed(".")))
+    
+    identifiers_df <- 
+      identifiers_df %>% 
+      dplyr::mutate(suffix = stringr::str_extract(string = domain, 
+                                                  pattern = public_suffix_regex)) %>% 
+      dplyr::mutate(domain = paste0(stringr::word(string = stringr::str_replace_all(string = stringr::str_remove(string = domain,
+                                                                                                                 pattern = stringr::regex(paste0(suffix, "$"))),
+                                                                                    pattern = stringr::fixed("."),
+                                                                                    replacement = " "),
+                                                  start = -1),
+                                    suffix)) %>% 
+      dplyr::select(-suffix) 
+  }
+  
   if (long == TRUE) {
-    message("\nStep 2: Convert into long data frame\n")
+    message("\nConvert into long data frame\n")
     identifiers_to_process <- colnames(identifiers_df)[!is.element(colnames(identifiers_df), c("date", "domain", "network_id"))]
     pb <- dplyr::progress_estimated(length(identifiers_to_process))
     identifiers_df_long <- purrr::map_dfr(.x = identifiers_to_process,

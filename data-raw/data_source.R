@@ -37,9 +37,23 @@ default_identifiers <- c("ua",
 
 usethis::use_data(default_identifiers, overwrite = TRUE)
 
-public_suffix_list <- tibble::tibble(list = readLines(con = "https://www.publicsuffix.org/list/public_suffix_list.dat")) %>% 
-  filter(!str_detect(string = list, pattern = "//")) %>% 
-  filter(!str_detect(string = list, pattern = stringr::fixed("*"))) %>% 
-  filter(list!="")
+public_suffix_list <- tibble::tibble(list = c("wordpress.com", "altervista.org", "weebly.com", "webnode.it", "over-blog.com",
+                                              readLines(con = "https://www.publicsuffix.org/list/public_suffix_list.dat"))) %>% 
+  dplyr::filter(!stringr::str_detect(string = list, pattern = "//")) %>% 
+  dplyr::filter(!stringr::str_detect(string = list, pattern = stringr::fixed("*"))) %>% 
+  dplyr::filter(list!="")
 
 usethis::use_data(public_suffix_list, overwrite = TRUE)
+
+public_suffix_regex <- public_suffix_list %>% 
+  dplyr::mutate(nchar = nchar(list)) %>% 
+  dplyr::arrange(desc(nchar)) %>% 
+  dplyr::mutate(list = paste0(".", list)) %>% 
+  dplyr::mutate(list = stringr::str_replace_all(string = list,
+                                                pattern = stringr::fixed("."),
+                                                replacement = stringr::fixed("\\."))) %>% 
+  dplyr::pull(list) %>%
+  paste(collapse = "$|")
+
+usethis::use_data(public_suffix_regex, overwrite = TRUE)
+
