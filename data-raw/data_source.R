@@ -22,7 +22,9 @@ default_excluded_ua <-
                   "UA-5354236", "over-blog",
                   "UA-1240215", "altervista",
                   "UA-25224921", "bit.ly",
-                  "UA-38185442", "peek.link") 
+                  "UA-38185442", "peek.link", 
+                  "UA-797705", "webnode.it",
+                  "UA-7265702", "unclear") 
 
 usethis::use_data(default_excluded_ua, overwrite = TRUE)
 
@@ -34,3 +36,10 @@ default_identifiers <- c("ua",
                          "taboola")
 
 usethis::use_data(default_identifiers, overwrite = TRUE)
+
+public_suffix_list <- tibble::tibble(list = readLines(con = "https://www.publicsuffix.org/list/public_suffix_list.dat")) %>% 
+  filter(!str_detect(string = list, pattern = "//")) %>% 
+  filter(!str_detect(string = list, pattern = stringr::fixed("*"))) %>% 
+  filter(list!="")
+
+usethis::use_data(public_suffix_list, overwrite = TRUE)

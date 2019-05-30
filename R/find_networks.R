@@ -24,7 +24,7 @@ nwd_find_network <- function(domain,
     dplyr::mutate(id = dplyr::if_else(condition = id=="",
                                       true = as.character(NA),
                                       false = paste(identifier, id, sep = "_"))) %>% 
-    tidyr::drop_na() 
+    tidyr::drop_na()
   
   ## clean up
   # TODO allow customisation
@@ -80,7 +80,7 @@ nwd_find_network <- function(domain,
 #' 
 #' @export
 #' 
-nwd_add_network_id <- function(identifiers_df = nwd_load_identifiers_df(),
+nwd_add_network_id <- function(identifiers_df = nwd_load_identifiers_df(), 
                                language = NULL, 
                                identifiers = NULL,
                                temporary_files = NULL,
@@ -215,11 +215,11 @@ nwd_create_domain_graph_all_connections <- function(domains,
 #' 
 #' 
 
-nwd_create_domain_graph_identifiers <- function(network,
-                                                identifiers_df = nwd_load_identifiers_df(),
-                                                identifiers = NULL,
-                                                only_shared_identifiers = TRUE, 
-                                                plot = TRUE) {
+nwd_show_network <- function(network,
+                              identifiers_df = nwd_load_identifiers_df(),
+                              identifiers = NULL,
+                              only_shared_identifiers = TRUE, 
+                              plot = TRUE) {
   if (is.character(network) == TRUE & length(network)==1) {
     network <- nwd_find_network(domain = network,
                                 identifiers_df = identifiers_df,
@@ -227,7 +227,7 @@ nwd_create_domain_graph_identifiers <- function(network,
   }
   
   if (is.null(identifiers)) {
-    identifiers <- unique(domains$identifier)
+    identifiers <- unique(network$identifier)
   }
 
   all_connections <- network %>% 
@@ -268,7 +268,7 @@ nwd_create_domain_graph_identifiers <- function(network,
                                           edges = edges,
                                           directed = TRUE)
   if (plot==TRUE) {
-    identifier_tidy %>% ggraph::ggraph() +
+    identifier_tidy %>% ggraph::ggraph(layout = "nicely") +
       #  geom_edge_arc(colour = "gray") +
       #ggraph::geom_edge_link(ggplot2::aes(colour = destination)) +
       ggraph::geom_edge_link(colour = "gray") +

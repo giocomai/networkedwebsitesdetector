@@ -95,7 +95,8 @@ nwd_load_identifiers_df <- function(language = NULL,
                                     long = TRUE, 
                                     store = TRUE,
                                     cache = TRUE,
-                                    keep_duplicates = FALSE) {
+                                    keep_duplicates = FALSE,
+                                    top_domain_only = TRUE) {
   if (is.null(language)==TRUE) {
     language <- list.dirs(file.path("identifiers"), recursive = FALSE, full.names = FALSE)
   }

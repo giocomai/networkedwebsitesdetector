@@ -73,7 +73,6 @@ nwd_extract_domains <- function(language = NULL,
               file = fs::path("domains", i, paste0(j, "_", i, "_domains.rds")))
     }
   }
-  invisible(domains_by_date)
 }
 
 

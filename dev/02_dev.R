@@ -15,7 +15,7 @@ golem::add_module( name = "my_other_module") # Name of the module
 
 # usethis::use_package("pkg") # To call each time you need a new package
 usethis::use_package("stringr")
-usethis::use_package("xml2")
+usethis::use_package("longurl")
 
 ## 2.3 Add tests
 
@@ -28,10 +28,10 @@ golem::add_browser_button()
 # 3. Documentation
 
 ## 3. Vignette
-usethis::use_vignette("networkedwebsitesdetector")
+usethis::use_vignette("analysis")
 devtools::build_vignettes()
 
-## 3. Code coverage
+  ## 3. Code coverage
 usethis::use_travis()
 usethis::use_appveyor()
 usethis::use_coverage()
