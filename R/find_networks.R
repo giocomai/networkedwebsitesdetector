@@ -143,10 +143,11 @@ nwd_add_network_id <- function(identifiers_df = nwd_load_identifiers_df(),
       }
     }
   }
-  fs::dir_create(path = fs::path("network_df", i), recurse = TRUE)
+  fs::dir_create(path = fs::path("network_df", i, Sys.Date()), recurse = TRUE)
   saveRDS(object = identifiers_df,
           file = fs::path("network_df",
                           i,
+                          Sys.Date(),
                           paste0(Sys.Date(),
                                  "_",
                                  i, 
