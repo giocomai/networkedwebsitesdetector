@@ -154,7 +154,7 @@ nwd_restore <- function(date = NULL,
 #' 
 #' @export
 
-nwd_backup_to_googledrive <- function(date = NULL,
+nwd_upload_to_googledrive <- function(date = NULL,
                                       folder = "tweets",
                                       timeframe = "daily",
                                       language = NULL,
