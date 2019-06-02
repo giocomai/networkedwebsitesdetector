@@ -11,8 +11,8 @@ get_screenshot <- function(domain, width = 1280, height = 1280, language = NULL,
   if (is.null(language)==TRUE) {
     language <- list.dirs(file.path("data", "domains", "homepage"), recursive = FALSE, full.names = FALSE)
   }
-  fs::dir_create(path = file.path("data", "domains", "screenshots", language), recursive = TRUE)
-  fs::dir_create(path = file.path("data", "domains", "screenshots_failed", language), recursive = TRUE)
+  fs::dir_create(path = fs::path("data", "domains", "screenshots", language), recurse = TRUE)
+  fs::dir_create(path = fs::path("data", "domains", "screenshots_failed", language), recurse = TRUE)
   
   today_path <- file.path("data", "domains", "screenshots", language, Sys.Date())
   today_path_screenshots_failed <- file.path("data", "domains", "screenshots_failed", language, Sys.Date())

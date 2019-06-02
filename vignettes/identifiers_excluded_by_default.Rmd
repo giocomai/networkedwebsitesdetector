@@ -12,6 +12,8 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+
+library(networkedwebsitesdetector)
 ```
 
 For reference, here is a list of all identifiers excluded by default:
