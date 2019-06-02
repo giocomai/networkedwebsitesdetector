@@ -257,7 +257,7 @@ nwd_upload_to_googledrive <- function(date = NULL,
 #' 
 #' @export
 
-nwd_download_from_googldrive <- function(date = NULL,
+nwd_download_from_googledrive <- function(date = NULL,
                                          folder = "tweets",
                                          timeframe = "daily",
                                          language = NULL,
