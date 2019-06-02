@@ -1,0 +1,8 @@
+pandoc: 2.3.1
+pkgdown: 1.3.0
+pkgdown_sha: ~
+articles:
+  backup_restore: backup_restore.html
+  identifiers_excluded_by_default: identifiers_excluded_by_default.html
+  networkedwebsitesdetector: networkedwebsitesdetector.html
+
