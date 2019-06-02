@@ -1,0 +1,155 @@
+---
+title: "networkedwebsitesdetector"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{networkedwebsitesdetector}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval=FALSE
+)
+```
+
+```{r setup}
+library(networkedwebsitesdetector)
+```
+
+
+# Getting websites
+
+In order to find networks of websites, we need to have a list of websites. If you have it, you can skip to the "Download homepages" section. Otherwise, here's an approach to finding a list of websites, including (but not limited to) websites which talk about current events.
+
+This approach is based on getting news headlines in a given language, finding the words that appear most often in the news in a given day, then look for them on Twitter, and extract domain names from links inlcuded in those tweets. This package includes a number of helper functions to streamline the process.
+
+It is a very opinionated package, and will by default create folders, store things locally, and in ensuing steps process what is available, without demanding detailed paramater inputs from the user. The whole package is built assuming that the user will want to find networks of websites using a given language, but it makes it easy to replicate the same approach across languages. 
+
+The package includes a number of helper functions to compress, archive, and remotely back-up data on Google Drive. They will be presented in a separate vignette. 
+
+The whole process can be consistently repeated from a server. Details on how to set up a Docker image doing all the steps will also be presented in a separate vignette. 
+
+## Getting the news
+
+`nwd_get_emm_newsbrief` gets the current rss feed from a news aggregator, [EMM newsbrief](http://emm.newsbrief.eu/), and stores them in a local sub-folder according to a pre-defined scheme.
+
+```{r}
+nwd_get_emm_newsbrief(languages = "it")
+```
+
+Timestamped files are stored in a subfolders by date, as follows, by default both in the original xml format and in a pre-processed data frame to be used more easily in R. 
+
+```{r}
+fs::dir_tree(path = "emm_newsbrief")
+```
+
+Having downloaded some news, it is possible to extract what were the most frequent keywords over a given period, such as a given date. Again, an helper function will remove relevant stopwords and output the words most frequently used over a given day, and store resulting data locally. 
+
+
+```{r}
+nwd_extract_keywords()
+```
+
+```{r}
+fs::dir_tree(path = "keywords")
+```
+
+## Getting inputs from Twitter
+
+Once keywords are extracted, it is possible to look for them on Twitter. This assumes a valid Twitter token is part of the environment, as [detailed here](https://rtweet.info/articles/auth.html). 
+
+```{r}
+nwd_get_tweets()
+
+```
+
+Name of files include details about the exact query made to the Twitter api: first the term, then the language filter, then the number of tweets requested, the type of tweets requested (can be "recent", "mixed", or "popular"), and the exact timing of the request. 
+
+```{r}
+fs::dir_tree(path = "tweets")
+```
+
+## Extracting links and domains
+
+
+Now, it's time to get links out of tweets. URLs shortened not only by Twitter, but also by third parties such as bit.ly, are expanded by default. Expanding URLs can be time consuming, so keep this in mind as you plan activities. 
+
+
+```{r}
+
+nwd_extract_urls_from_tweets()
+    
+```
+
+```{r}
+fs::dir_tree(path = "tweet_links")
+```
+
+
+It would now be possible to download links, or at least the most common among them, as the number of unique links grows very quickly. As a first step, it may however make sense to extract only the homepage for each of the links found so far. 
+
+```{r}
+nwd_extract_domains()
+```
+
+# Download homepages
+
+Based on the domain names extracted from links included in tweets as details above, it is now possible to download home pages. Of course, if you already have a list of domains you wish to download, you can skip all previous steps and start with `nwd_get_homepage()`.
+
+```{r}
+domains <- purrr::map_dfr(.x = fs::dir_ls(path = fs::path("domains", "it")), .f = readRDS)
+
+nwd_get_homepage(domain = unique(domains$domain), language = "it")
+
+
+```
+
+
+`nwd_get_homepage()` downloads homepages in html format in a dedicated, dated subfolder. By default, it does not download again a file if has been already downloaded in the last three months. This can be customised by setting the `since` parameter, e.g. `nwd_get_homepage(domain = unique(domains$domain), language = "it", since = Sys.Date()-31)`. 
+
+
+```{r}
+nwd_clean_files(remove_exceeding = TRUE)
+```
+
+
+# Extract identifiers
+
+The following function will extract identifiers such as Google Analytics and Google Adwords id, and store them in a dated folder.
+
+```{r}
+nwd_extract_identifiers()
+```
+
+# Find networks
+
+Once identifiers have been extracted, it is finally possible to find networks. A table in the long format including all identifiers can be retrieved with the following command:
+
+```{r}
+nwd_load_identifiers_df()
+```
+
+If you wish to include an additional column showing which networks share the same id, there is a dedicated function for that:
+
+```{r}
+nwd_add_network_id()
+```
+
+Both of these by default store the output in a dedicated subfolder, in order to limit re-processing of the same data, as these are steps that can easily take hours of computing time.
+
+If you wish to find out about the network of a specific domain, you can use the following command:
+
+
+```{r}
+nwd_find_related_domains()
+```
+
+If youy prefer a visual output, this command will create the relevant graph:
+
+```{r}
+nwd_create_domain_graph_identifiers()
+```
+

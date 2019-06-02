@@ -1,6 +1,6 @@
 Package: networkedwebsitesdetector
 Title: A structured approach for finding networked websites
-Version: 0.0.0.9000
+Version: 0.0.1.9000
 Authors@R: person('Giorgio', 'Comai', email = 'g@giorgiocomai.eu', role = c('cre', 'aut'))
 Description: A structured approach for finding websites which have clear signs of common ownership or are otherwise related.
 License: GPL-3
@@ -24,8 +24,6 @@ Imports:
     lubridate,
     ggraph,
     tidygraph
-Remotes: 
-    Thinkr-open/golem
 RoxygenNote: 6.1.1
 URL: https://github.com/giocomai/networkedwebsitesdetector
 BugReports: https://github.com/giocomai/networkedwebsitesdetector/issues

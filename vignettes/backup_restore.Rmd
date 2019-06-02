@@ -1,0 +1,104 @@
+---
+title: "Backup and restore files"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{backup_restore}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = FALSE
+)
+```
+
+```{r setup}
+library(networkedwebsitesdetector)
+```
+
+# Archive and store remotely
+
+Working at scale, disk space may soon become an issue. `networkedwebsitesdetector` includes a series of convenience functions to compress downloaded materials, and store them remotely on Google Drive.
+
+This function compresses and stores in a dedicated folder all relevant files.
+
+
+```{r}
+nwd_archive(date = NULL,
+            folder = "tweets",
+            timeframe = "daily",
+            language = "it",
+            filetype = "rds")
+
+```
+
+They can be safely deleted, as they can be easily recovered with:
+
+```{r}
+nwd_restore(date = NULL,
+            folder = "tweets",
+            timeframe = "daily",
+            language = "it",
+            filetype = "rds")
+```
+
+As storage space runs out quickly, this package includes helper functions facilitating uploading compressed files to Google Drive. Additional functions make it easy to download and restore data at need for further analysis. 
+
+### Upload to Google Drive
+
+Users may want to give access only to folders created via R's googledrive, preventing access to all other user data. 
+
+```{r}
+googledrive::drive_auth(email = "<your_email>@gmail.com",
+                        scopes = "https://www.googleapis.com/auth/drive.file")
+```
+
+
+If date is not given, all available dates will be uploaded/downloaded (without overwriting already existing files).
+
+```{r}
+
+nwd_upload_to_googledrive(date = NULL,
+                          folder = "emm_newsbrief",
+                          timeframe = "daily",
+                          language = "it",
+                          filetype = "rds")
+```
+
+
+To restore:
+
+```{r}
+nwd_download_from_googledrive(date = NULL,
+                             folder = "emm_newsbrief",
+                             timeframe = "daily",
+                             language = "it",
+                             filetype = "rds")
+```
+
+
+## Restore everything in an empty folder
+
+In brief, a routine such as the following (likely to be further simplified in future version), would restore all the main data gathered, leaving the bulky archive of html files on Google Drive only.
+
+```{r}
+nwd_download_from_googledrive(folder = "emm_newsbrief", timeframe = "daily", language = "it", filetype = "rds")
+nwd_restore(folder = "emm_newsbrief", timeframe = "daily", language = "it", filetype = "rds")
+
+nwd_download_from_googledrive(folder = "tweets", timeframe = "daily", language = "it", filetype = "rds")
+nwd_restore(folder = "tweets", timeframe = "daily", language = "it", filetype = "rds")
+
+nwd_download_from_googledrive(folder = "identifiers", timeframe = "daily", language = "it", filetype = "rds")
+nwd_restore(folder = "identifiers", timeframe = "daily", language = "it", filetype = "rds")
+
+nwd_download_from_googledrive(folder = "tweet_links", timeframe = "daily", language = "it", filetype = "rds")
+nwd_restore(folder = "tweet_links", timeframe = "daily", language = "it", filetype = "rds")
+
+nwd_download_from_googledrive(folder = "network_df", timeframe = "daily", language = "it", filetype = "rds")
+nwd_restore(folder = "network_df", timeframe = "daily", language = "it", filetype = "rds")
+
+```
+

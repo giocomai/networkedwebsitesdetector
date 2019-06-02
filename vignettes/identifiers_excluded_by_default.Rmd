@@ -16,16 +16,20 @@ knitr::opts_chunk$set(
 library(networkedwebsitesdetector)
 ```
 
+## UA
+
 For reference, here is a list of all identifiers excluded by default:
 
 ```{r}
 knitr::kable(default_excluded_ua)
 ```
 
-
+## Facebook app id
 ```{r}
 knitr::kable(default_excluded_fb_app_id)
 ```
+
+## Facebook admin
 
 ```{r}
 knitr::kable(default_excluded_fb_admins)
