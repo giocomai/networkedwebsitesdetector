@@ -19,14 +19,14 @@ Additional details, use cases, and examples of outputs will be added.
 
 ## Installation
 
-You can install the released version of `networkedwebsitesdetector` from
-[CRAN](https://CRAN.R-project.org) with:
+You can install the development version of `networkedwebsitesdetector`
+from [CRAN](https://CRAN.R-project.org) with:
 
 ``` r
 remotes::install_github("giocomai/networkedwebsitesdetector")
 ```
 
-As of this writing (2019-06-02), the package works with the development
+As of this writing (2019-09-06), the package works with the development
 versions of both `tidyr` and `googledrive` and will result in errors
 with the current cran versions. This notice will be removed as soon as
 the current development version of both will make it to CRAN.
