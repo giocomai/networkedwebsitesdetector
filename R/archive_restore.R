@@ -12,6 +12,7 @@ nwd_archive <- function(date = NULL,
                         timeframe = "daily",
                         language = NULL,
                         filetype = "rds") {
+  date_provided <- date 
   
   if (is.null(language)) {
     language <-  fs::dir_ls(path = fs::path(folder),
@@ -21,7 +22,7 @@ nwd_archive <- function(date = NULL,
   }
   
   for (i in language) {
-    if (is.null(date)) {
+    if (is.null(date_provided)) {
       date <- fs::dir_ls(path = fs::path(folder, i), recurse = FALSE, type = "directory") %>% 
         fs::path_file()
     }
