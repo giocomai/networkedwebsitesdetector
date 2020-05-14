@@ -80,7 +80,7 @@ Now, it's time to get links out of tweets. URLs shortened not only by Twitter, b
 
 ```{r}
 
-nwd_extract_urls_from_tweets()
+nwd_extract_urls()
     
 ```
 
@@ -144,12 +144,11 @@ If you wish to find out about the network of a specific domain, you can use the 
 
 
 ```{r}
-nwd_find_related_domains()
+nwd_find_network()
+
+nwd_show_network()
 ```
 
 If youy prefer a visual output, this command will create the relevant graph:
 
-```{r}
-nwd_create_domain_graph_identifiers()
-```
 

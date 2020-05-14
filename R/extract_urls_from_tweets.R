@@ -57,7 +57,7 @@ nwd_extract_urls_from_tweets <- function(tweets = NULL,
 
 #' Extract links from tweets and expands shortened urls
 #' 
-#' @param tweets A data frame of tweets, as created by `rtweet`. 
+#' @param urls A character vector of urls, or a data frame of tweets, as created by `rtweet`.
 #' @param n_char An integer, defaults to 30. Number of characters in the url: only urls shorter than n_char will be expanded, others will be kept as they are.  
 #' @param n_retry An integer, defaults to 1. Number of times it tries to expand urls if first attempt fails. Set to 0 for attempting only once.
 #' @return A data.frame (a tibble) with 9 columns: "user_id", "status_id", "created_at", "screen_name", text", "orig_url","expanded_url", "status_code", "url" 
@@ -66,10 +66,11 @@ nwd_extract_urls_from_tweets <- function(tweets = NULL,
 #' @export
 
 
-nwd_expand_urls_from_tweets <- function(tweets,
-                                        n_char = 30,
-                                        n_retry = 1) {
-  if (nrow(tweets)>0) {
+nwd_expand_urls <- function(urls,
+                            n_char = 30,
+                            n_retry = 1) {
+  
+  if(is.data.frame(urls)==TRUE) {
     all_links <- tweets %>% 
       dplyr::select(user_id, status_id, created_at, screen_name, text, urls_expanded_url) %>% 
       tidyr::unnest(urls_expanded_url) %>% 
@@ -79,48 +80,46 @@ nwd_expand_urls_from_tweets <- function(tweets,
       dplyr::filter(nchar(urls_expanded_url)<n_char) %>% 
       dplyr::pull(urls_expanded_url) 
     
-    if (length(all_links_long_pre)>0) {
-      all_links_long <- tryCatch({longurl::expand_urls(all_links_long_pre)},
-                                 error=function(e){cat("ERROR:",conditionMessage(e), "\n")})
-      
-      if (n_retry > 0) {
-        for (i in 1:n_retry) {
-          if (is.null(all_links_long) == FALSE) {
-            all_links_long_pre_retry <- 
-              all_links_long %>% 
-              dplyr::filter(is.na(expanded_url)==TRUE) %>% 
-              dplyr::pull(orig_url)
-            
-            all_links_long_retry <- tryCatch({longurl::expand_urls(all_links_long_pre_retry)},
-                                             error=function(e){cat("ERROR:",conditionMessage(e), "\n")})
-            
-            all_links_long <- dplyr::bind_rows(all_links_long_retry, all_links_long) %>% 
-              dplyr::distinct(orig_url, .keep_all=TRUE)
-            
-          }
-        }
-      }
-      
-      if (is.null(all_links_long)==FALSE) {
-        if (nrow(all_links_long)>0) {
-          all_links_long_merged <- 
-            all_links %>% 
-            dplyr::rename(orig_url = urls_expanded_url) %>% 
-            dplyr::left_join(y = all_links_long, by = "orig_url") %>% 
-            dplyr::mutate(url = dplyr::if_else(condition = is.na(expanded_url),
-                                               true = as.character(orig_url),
-                                               false = as.character(expanded_url))) %>% 
-            dplyr::ungroup() 
-          return(all_links_long_merged) 
-        }
-      }
-    } 
+  } else {
+    all_links_long_pre <- urls[nchar(urls)<n_char]
   }
-    
-  all_links %>% 
-    dplyr::rename(orig_url = urls_expanded_url) %>%  
-    dplyr::mutate(expanded_url = as.character(NA),
-                  status_code = as.integer(NA), 
-                  url = as.character(orig_url)) %>% 
-    dplyr::ungroup() 
+  
+  if (length(all_links_long_pre)==0) {
+    warning("No links to unshorten.")
+  }
+  
+  all_links_long <- tryCatch({longurl::expand_urls(all_links_long_pre)},
+                             error=function(e){cat("ERROR:",conditionMessage(e), "\n")})
+  
+  if (n_retry > 0) {
+    for (i in 1:n_retry) {
+      if (is.null(all_links_long) == FALSE) {
+        all_links_long_pre_retry <- 
+          all_links_long %>% 
+          dplyr::filter(is.na(expanded_url)==TRUE) %>% 
+          dplyr::pull(orig_url)
+        
+        all_links_long_retry <- tryCatch({longurl::expand_urls(all_links_long_pre_retry)},
+                                         error=function(e){cat("ERROR:",conditionMessage(e), "\n")})
+        
+        all_links_long <- dplyr::bind_rows(all_links_long_retry, all_links_long) %>% 
+          dplyr::distinct(orig_url, .keep_all=TRUE)
+        
+      }
+    }
+  }
+  
+  if(is.data.frame(urls)==TRUE) {
+    all_links_long_merged <- 
+      all_links %>% 
+      dplyr::rename(orig_url = urls_expanded_url) %>% 
+      dplyr::left_join(y = all_links_long, by = "orig_url") %>% 
+      dplyr::mutate(url = dplyr::if_else(condition = is.na(expanded_url),
+                                         true = as.character(orig_url),
+                                         false = as.character(expanded_url))) %>% 
+      dplyr::ungroup() 
+    return(all_links_long_merged) 
+  } else {
+    return(all_links_long)
+  }
 }

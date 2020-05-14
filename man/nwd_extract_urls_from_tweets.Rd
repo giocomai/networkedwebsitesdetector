@@ -4,8 +4,14 @@
 \alias{nwd_extract_urls_from_tweets}
 \title{Extract links from tweets and expands shortened urls}
 \usage{
-nwd_extract_urls_from_tweets(tweets = NULL, language = NULL,
-  date = NULL, expand_url = TRUE, n_char = 30, n_retry = 3)
+nwd_extract_urls_from_tweets(
+  tweets = NULL,
+  language = NULL,
+  date = NULL,
+  expand_url = TRUE,
+  n_char = 30,
+  n_retry = 3
+)
 }
 \arguments{
 \item{tweets}{A data frame of tweets, as created by `rtweet`. If not given, it processes tweets available in `tweets` subfolder.}
