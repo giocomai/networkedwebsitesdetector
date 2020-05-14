@@ -4,9 +4,14 @@
 \alias{nwd_download_from_googledrive}
 \title{Download files archived in Google Drive}
 \usage{
-nwd_download_from_googledrive(date = NULL, folder = "tweets",
-  timeframe = "daily", language = NULL, filetype = "rds",
-  overwrite = FALSE)
+nwd_download_from_googledrive(
+  date = NULL,
+  folder = "tweets",
+  timeframe = "daily",
+  language = NULL,
+  filetype = "rds",
+  overwrite = FALSE
+)
 }
 \arguments{
 \item{language}{A character vector of language two letter codes. Defaults to NULL. If NULL, processes available languages.}

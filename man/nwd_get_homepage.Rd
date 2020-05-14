@@ -4,8 +4,12 @@
 \alias{nwd_get_homepage}
 \title{Download homepages by url in relevant sub-folder.}
 \usage{
-nwd_get_homepage(domain = NULL, language = NULL, shuffle = TRUE,
-  since = Sys.Date() - 91)
+nwd_get_homepage(
+  domain = NULL,
+  language = NULL,
+  shuffle = TRUE,
+  since = Sys.Date() - 91
+)
 }
 \arguments{
 \item{domain}{A character vector of one or more domain names.}

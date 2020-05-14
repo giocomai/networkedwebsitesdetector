@@ -4,8 +4,14 @@
 \alias{nwd_load_identifiers_df}
 \title{Load all identifiers_df}
 \usage{
-nwd_load_identifiers_df(language = NULL, long = TRUE, store = TRUE,
-  cache = TRUE, keep_duplicates = FALSE, top_domain_only = TRUE)
+nwd_load_identifiers_df(
+  language = NULL,
+  long = TRUE,
+  store = TRUE,
+  cache = TRUE,
+  keep_duplicates = FALSE,
+  top_domain_only = TRUE
+)
 }
 \arguments{
 \item{language}{A character vector of language two letter codes.}

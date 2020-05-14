@@ -4,9 +4,13 @@
 \alias{nwd_list_available_backups_on_google_drive}
 \title{List available backups on Google Drive}
 \usage{
-nwd_list_available_backups_on_google_drive(date = NULL,
-  folder = "tweets", timeframe = "daily", language = NULL,
-  filetype = "rds")
+nwd_list_available_backups_on_google_drive(
+  date = NULL,
+  folder = "tweets",
+  timeframe = "daily",
+  language = NULL,
+  filetype = "rds"
+)
 }
 \arguments{
 \item{language}{A character vector of language two letter codes. Defaults to NULL. If NULL, processes available languages.}

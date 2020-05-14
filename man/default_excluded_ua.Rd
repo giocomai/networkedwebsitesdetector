@@ -4,7 +4,9 @@
 \name{default_excluded_ua}
 \alias{default_excluded_ua}
 \title{ua ID to be excluded by default}
-\format{A character vector.}
+\format{
+A character vector.
+}
 \usage{
 default_excluded_ua
 }

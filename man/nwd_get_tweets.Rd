@@ -4,9 +4,16 @@
 \alias{nwd_get_tweets}
 \title{Searches keywords on Twitter.}
 \usage{
-nwd_get_tweets(keywords = NULL, date = NULL, language = NULL,
-  n_keywords = 10, n_tweets = 1000, tweet_type = "recent",
-  wait = 10, store = TRUE)
+nwd_get_tweets(
+  keywords = NULL,
+  date = NULL,
+  language = NULL,
+  n_keywords = 10,
+  n_tweets = 1000,
+  tweet_type = "recent",
+  wait = 10,
+  store = TRUE
+)
 }
 \arguments{
 \item{keywords}{A character vector or a data frame, with keywords in the first column. Defaults to NULL. If NULL, tries to import previously stored keywords for given language and date. If a data frame, it assumes that the first columns includes the keywords. If a character vector, it processes it directly.}

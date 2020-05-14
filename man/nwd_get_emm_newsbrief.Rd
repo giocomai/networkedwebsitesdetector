@@ -4,9 +4,12 @@
 \alias{nwd_get_emm_newsbrief}
 \title{Get current news in multiple languages from EMM newsbrief}
 \usage{
-nwd_get_emm_newsbrief(languages = c("ar", "bg", "cs", "da", "de", "el",
-  "en", "es", "et", "fi", "fr", "hr", "hu", "it", "lt", "lv", "nl", "pl",
-  "pt", "ro", "ru", "sk", "sl", "sv", "sw", "tr", "zh"), shuffle = TRUE)
+nwd_get_emm_newsbrief(
+  languages = c("ar", "bg", "cs", "da", "de", "el", "en", "es", "et", "fi", "fr", "hr",
+    "hu", "it", "lt", "lv", "nl", "pl", "pt", "ro", "ru", "sk", "sl", "sv", "sw", "tr",
+    "zh"),
+  shuffle = TRUE
+)
 }
 \arguments{
 \item{languages}{A character vector of one or more languages as two letter codes (e.g. "en").}

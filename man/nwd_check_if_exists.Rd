@@ -4,8 +4,13 @@
 \alias{nwd_check_if_exists}
 \title{Check if corresponding information for a given domain exists for a given data type and a given time period}
 \usage{
-nwd_check_if_exists(domain, type = "homepage", language = NULL,
-  since = Sys.Date() - 91, simplify = TRUE)
+nwd_check_if_exists(
+  domain,
+  type = "homepage",
+  language = NULL,
+  since = Sys.Date() - 91,
+  simplify = TRUE
+)
 }
 \arguments{
 \item{domain}{A domain name (e.g. "example.com").}

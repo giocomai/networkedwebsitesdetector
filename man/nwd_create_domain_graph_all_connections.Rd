@@ -4,9 +4,11 @@
 \alias{nwd_create_domain_graph_all_connections}
 \title{Create a graph of the network of one or more domains}
 \usage{
-nwd_create_domain_graph_all_connections(domains,
+nwd_create_domain_graph_all_connections(
+  domains,
   identifiers_df = nwd_load_identifiers_df(),
-  identifiers = default_identifiers)
+  identifiers = default_identifiers
+)
 }
 \arguments{
 \item{identifiers_df}{A data frame, typically created with extract extract_identifiers() and loaded with load_identifiers_df().}

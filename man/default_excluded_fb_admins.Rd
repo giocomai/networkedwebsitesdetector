@@ -4,7 +4,9 @@
 \name{default_excluded_fb_admins}
 \alias{default_excluded_fb_admins}
 \title{fb_admins ID to be excluded by default}
-\format{A character vector.}
+\format{
+A character vector.
+}
 \usage{
 default_excluded_fb_admins
 }

@@ -4,7 +4,9 @@
 \name{default_identifiers}
 \alias{default_identifiers}
 \title{Type of snippets used to identify networked websites}
-\format{A character vector.}
+\format{
+A character vector.
+}
 \usage{
 default_identifiers
 }

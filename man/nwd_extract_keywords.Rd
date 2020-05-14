@@ -4,8 +4,7 @@
 \alias{nwd_extract_keywords}
 \title{Extract most frequently used words from news titles}
 \usage{
-nwd_extract_keywords(language = NULL, date = NULL, n = Inf,
-  store = TRUE)
+nwd_extract_keywords(language = NULL, date = NULL, n = Inf, store = TRUE)
 }
 \arguments{
 \item{language}{A character vector of language two letter codes. Defaults to NULL. If NULL, processes available languages.}

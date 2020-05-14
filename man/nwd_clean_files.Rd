@@ -4,8 +4,12 @@
 \alias{nwd_clean_files}
 \title{Check if there are unusually small or unusually big files}
 \usage{
-nwd_clean_files(min_size = 0, max_size = 1e+08,
-  remove_exceeding = FALSE, language = NULL)
+nwd_clean_files(
+  min_size = 0,
+  max_size = 1e+08,
+  remove_exceeding = FALSE,
+  language = NULL
+)
 }
 \arguments{
 \item{min_size}{Minimum size in bytes, defaults to 0 (only files of size 0 are selected).}

@@ -4,9 +4,14 @@
 \alias{nwd_upload_to_googledrive}
 \title{Backup archived files to googledrive}
 \usage{
-nwd_upload_to_googledrive(date = NULL, folder = "tweets",
-  timeframe = "daily", language = NULL, filetype = "rds",
-  show_filenames_only = FALSE)
+nwd_upload_to_googledrive(
+  date = NULL,
+  folder = "tweets",
+  timeframe = "daily",
+  language = NULL,
+  filetype = "rds",
+  show_filenames_only = FALSE
+)
 }
 \arguments{
 \item{language}{A character vector of language two letter codes. Defaults to NULL. If NULL, processes available languages.}

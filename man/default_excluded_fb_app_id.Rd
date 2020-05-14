@@ -4,7 +4,9 @@
 \name{default_excluded_fb_app_id}
 \alias{default_excluded_fb_app_id}
 \title{fb_app_id ID to be excluded by default}
-\format{A character vector.}
+\format{
+A character vector.
+}
 \usage{
 default_excluded_fb_app_id
 }

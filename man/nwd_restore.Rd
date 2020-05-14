@@ -4,8 +4,14 @@
 \alias{nwd_restore}
 \title{Restore data from compressed files}
 \usage{
-nwd_restore(date = NULL, folder = "tweets", timeframe = "daily",
-  language = NULL, filetype = "rds", filenames_only = FALSE)
+nwd_restore(
+  date = NULL,
+  folder = "tweets",
+  timeframe = "daily",
+  language = NULL,
+  filetype = "rds",
+  filenames_only = FALSE
+)
 }
 \arguments{
 \item{language}{A character vector of language two letter codes. Defaults to NULL. If NULL, processes available languages.}

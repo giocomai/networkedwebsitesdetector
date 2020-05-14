@@ -4,8 +4,7 @@
 \alias{nwd_adjust_folder_names}
 \title{Adjusts file names of folders with single digits}
 \usage{
-nwd_adjust_folder_names(folder = "tweets", language = NULL,
-  date = NULL)
+nwd_adjust_folder_names(folder = "tweets", language = NULL, date = NULL)
 }
 \arguments{
 \item{language}{A character vector of language two letter codes. Defaults to NULL. If NULL, processes available languages.}

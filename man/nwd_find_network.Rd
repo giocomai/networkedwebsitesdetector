@@ -4,8 +4,13 @@
 \alias{nwd_find_network}
 \title{Find domains related to each across key identifiers}
 \usage{
-nwd_find_network(domain, identifiers_df = nwd_load_identifiers_df(),
-  identifiers = NULL, language = NULL, max_run_n = 10)
+nwd_find_network(
+  domain,
+  identifiers_df = nwd_load_identifiers_df(),
+  identifiers = NULL,
+  language = NULL,
+  max_run_n = 10
+)
 }
 \arguments{
 \item{identifiers_df}{A dataframe of indentifiers in the long format, typically created with `nwd_load_identifiers_df()`.}

@@ -4,8 +4,11 @@
 \alias{nwd_extract_identifiers_from_backup}
 \title{Extract identifiers from backuped homepages}
 \usage{
-nwd_extract_identifiers_from_backup(language, local = TRUE,
-  googledrive = FALSE)
+nwd_extract_identifiers_from_backup(
+  language,
+  local = TRUE,
+  googledrive = FALSE
+)
 }
 \arguments{
 \item{language}{A character vector of length one corresponding to a language two-letter code.}
