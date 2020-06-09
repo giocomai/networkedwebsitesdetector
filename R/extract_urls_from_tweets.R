@@ -120,6 +120,12 @@ nwd_expand_urls <- function(urls,
       dplyr::ungroup() 
     return(all_links_long_merged) 
   } else {
-    return(all_links_long)
+    all_links_long_merged <- 
+      tibble::tibble(orig_url = urls) %>% 
+      dplyr::left_join(y = all_links_long, by = "orig_url") %>% 
+      dplyr::mutate(url = dplyr::if_else(condition = is.na(expanded_url),
+                                         true = as.character(orig_url),
+                                         false = as.character(expanded_url))) 
+    return(all_links_long_merged)
   }
 }
