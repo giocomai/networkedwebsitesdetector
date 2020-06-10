@@ -81,11 +81,18 @@ nwd_expand_urls <- function(urls,
       dplyr::pull(urls_expanded_url) 
     
   } else {
-    all_links_long_pre <- urls[nchar(urls)<n_char]
+    all_links_long_pre <- urls[nchar(urls)<n_char] %>% 
+      unique()
   }
   
   if (length(all_links_long_pre)==0) {
     warning("No links to unshorten.")
+    if (is.data.frame(urls)==FALSE) {
+      return(tibble::tibble(orig_url = urls, 
+                            expanded_url = NA, 
+                            status_code = NA, 
+                            url = urls))
+    }
   }
   
   all_links_long <- tryCatch({longurl::expand_urls(all_links_long_pre)},
