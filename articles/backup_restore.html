@@ -38,12 +38,6 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
 <li>
-  <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="../articles/networkedwebsitesdetector.html">Get started</a>
 </li>
 <li>
@@ -82,7 +76,8 @@
 
       
 
-      </header><div class="row">
+      </header><script src="backup_restore_files/accessible-code-block-0.0.1/empty-anchor.js"></script><link href="backup_restore_files/anchor-sections-1.0/anchor-sections.css" rel="stylesheet">
+<script src="backup_restore_files/anchor-sections-1.0/anchor-sections.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Backup and restore files</h1>
@@ -95,62 +90,69 @@
 
     
     
-<div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">networkedwebsitesdetector</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb1"><pre class="downlit">
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/giocomai/networkedwebsitesdetector">networkedwebsitesdetector</a></span><span class="op">)</span></pre></div>
 <div id="archive-and-store-remotely" class="section level1">
 <h1 class="hasAnchor">
 <a href="#archive-and-store-remotely" class="anchor"></a>Archive and store remotely</h1>
 <p>Working at scale, disk space may soon become an issue. <code>networkedwebsitesdetector</code> includes a series of convenience functions to compress downloaded materials, and store them remotely on Google Drive.</p>
 <p>This function compresses and stores in a dedicated folder all relevant files.</p>
-<div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="fu"><a href="../reference/nwd_archive.html">nwd_archive</a></span>(<span class="kw">date</span> <span class="kw">=</span> <span class="kw">NULL</span>,
-            <span class="kw">folder</span> <span class="kw">=</span> <span class="st">"tweets"</span>,
-            <span class="kw">timeframe</span> <span class="kw">=</span> <span class="st">"daily"</span>,
-            <span class="kw">language</span> <span class="kw">=</span> <span class="st">"it"</span>,
-            <span class="kw">filetype</span> <span class="kw">=</span> <span class="st">"rds"</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb2"><pre class="downlit">
+<span class="fu"><a href="../reference/nwd_archive.html">nwd_archive</a></span><span class="op">(</span>date <span class="op">=</span> <span class="cn">NULL</span>,
+            folder <span class="op">=</span> <span class="st">"tweets"</span>,
+            timeframe <span class="op">=</span> <span class="st">"daily"</span>,
+            language <span class="op">=</span> <span class="st">"it"</span>,
+            filetype <span class="op">=</span> <span class="st">"rds"</span><span class="op">)</span></pre></div>
 <p>They can be safely deleted, as they can be easily recovered with:</p>
-<div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="fu"><a href="../reference/nwd_restore.html">nwd_restore</a></span>(<span class="kw">date</span> <span class="kw">=</span> <span class="kw">NULL</span>,
-            <span class="kw">folder</span> <span class="kw">=</span> <span class="st">"tweets"</span>,
-            <span class="kw">timeframe</span> <span class="kw">=</span> <span class="st">"daily"</span>,
-            <span class="kw">language</span> <span class="kw">=</span> <span class="st">"it"</span>,
-            <span class="kw">filetype</span> <span class="kw">=</span> <span class="st">"rds"</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb3"><pre class="downlit">
+<span class="fu"><a href="../reference/nwd_restore.html">nwd_restore</a></span><span class="op">(</span>date <span class="op">=</span> <span class="cn">NULL</span>,
+            folder <span class="op">=</span> <span class="st">"tweets"</span>,
+            timeframe <span class="op">=</span> <span class="st">"daily"</span>,
+            language <span class="op">=</span> <span class="st">"it"</span>,
+            filetype <span class="op">=</span> <span class="st">"rds"</span><span class="op">)</span></pre></div>
 <p>As storage space runs out quickly, this package includes helper functions facilitating uploading compressed files to Google Drive. Additional functions make it easy to download and restore data at need for further analysis.</p>
 <div id="upload-to-google-drive" class="section level3">
 <h3 class="hasAnchor">
 <a href="#upload-to-google-drive" class="anchor"></a>Upload to Google Drive</h3>
 <p>Users may want to give access only to folders created via R’s googledrive, preventing access to all other user data.</p>
-<div class="sourceCode" id="cb4"><html><body><pre class="r"><span class="kw pkg">googledrive</span><span class="kw ns">::</span><span class="fu">drive_auth</span>(<span class="kw">email</span> <span class="kw">=</span> <span class="st">"&lt;your_email&gt;@gmail.com"</span>,
-                        <span class="kw">scopes</span> <span class="kw">=</span> <span class="st">"https://www.googleapis.com/auth/drive.file"</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb4"><pre class="downlit">
+<span class="fu">googledrive</span><span class="fu">::</span><span class="fu">drive_auth</span><span class="op">(</span>email <span class="op">=</span> <span class="st">"&lt;your_email&gt;@gmail.com"</span>,
+                        scopes <span class="op">=</span> <span class="st">"https://www.googleapis.com/auth/drive.file"</span><span class="op">)</span></pre></div>
 <p>If date is not given, all available dates will be uploaded/downloaded (without overwriting already existing files).</p>
-<div class="sourceCode" id="cb5"><html><body><pre class="r">
-<span class="fu"><a href="../reference/nwd_upload_to_googledrive.html">nwd_upload_to_googledrive</a></span>(<span class="kw">date</span> <span class="kw">=</span> <span class="kw">NULL</span>,
-                          <span class="kw">folder</span> <span class="kw">=</span> <span class="st">"emm_newsbrief"</span>,
-                          <span class="kw">timeframe</span> <span class="kw">=</span> <span class="st">"daily"</span>,
-                          <span class="kw">language</span> <span class="kw">=</span> <span class="st">"it"</span>,
-                          <span class="kw">filetype</span> <span class="kw">=</span> <span class="st">"rds"</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb5"><pre class="downlit">
+
+<span class="fu"><a href="../reference/nwd_upload_to_googledrive.html">nwd_upload_to_googledrive</a></span><span class="op">(</span>date <span class="op">=</span> <span class="cn">NULL</span>,
+                          folder <span class="op">=</span> <span class="st">"emm_newsbrief"</span>,
+                          timeframe <span class="op">=</span> <span class="st">"daily"</span>,
+                          language <span class="op">=</span> <span class="st">"it"</span>,
+                          filetype <span class="op">=</span> <span class="st">"rds"</span><span class="op">)</span></pre></div>
 <p>To restore:</p>
-<div class="sourceCode" id="cb6"><html><body><pre class="r"><span class="fu"><a href="../reference/nwd_download_from_googledrive.html">nwd_download_from_googledrive</a></span>(<span class="kw">date</span> <span class="kw">=</span> <span class="kw">NULL</span>,
-                             <span class="kw">folder</span> <span class="kw">=</span> <span class="st">"emm_newsbrief"</span>,
-                             <span class="kw">timeframe</span> <span class="kw">=</span> <span class="st">"daily"</span>,
-                             <span class="kw">language</span> <span class="kw">=</span> <span class="st">"it"</span>,
-                             <span class="kw">filetype</span> <span class="kw">=</span> <span class="st">"rds"</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb6"><pre class="downlit">
+<span class="fu"><a href="../reference/nwd_download_from_googledrive.html">nwd_download_from_googledrive</a></span><span class="op">(</span>date <span class="op">=</span> <span class="cn">NULL</span>,
+                             folder <span class="op">=</span> <span class="st">"emm_newsbrief"</span>,
+                             timeframe <span class="op">=</span> <span class="st">"daily"</span>,
+                             language <span class="op">=</span> <span class="st">"it"</span>,
+                             filetype <span class="op">=</span> <span class="st">"rds"</span><span class="op">)</span></pre></div>
 </div>
 <div id="restore-everything-in-an-empty-folder" class="section level2">
 <h2 class="hasAnchor">
 <a href="#restore-everything-in-an-empty-folder" class="anchor"></a>Restore everything in an empty folder</h2>
 <p>In brief, a routine such as the following (likely to be further simplified in future version), would restore all the main data gathered, leaving the bulky archive of html files on Google Drive only.</p>
-<div class="sourceCode" id="cb7"><html><body><pre class="r"><span class="fu"><a href="../reference/nwd_download_from_googledrive.html">nwd_download_from_googledrive</a></span>(<span class="kw">folder</span> <span class="kw">=</span> <span class="st">"emm_newsbrief"</span>, <span class="kw">timeframe</span> <span class="kw">=</span> <span class="st">"daily"</span>, <span class="kw">language</span> <span class="kw">=</span> <span class="st">"it"</span>, <span class="kw">filetype</span> <span class="kw">=</span> <span class="st">"rds"</span>)
-<span class="fu"><a href="../reference/nwd_restore.html">nwd_restore</a></span>(<span class="kw">folder</span> <span class="kw">=</span> <span class="st">"emm_newsbrief"</span>, <span class="kw">timeframe</span> <span class="kw">=</span> <span class="st">"daily"</span>, <span class="kw">language</span> <span class="kw">=</span> <span class="st">"it"</span>, <span class="kw">filetype</span> <span class="kw">=</span> <span class="st">"rds"</span>)
+<div class="sourceCode" id="cb7"><pre class="downlit">
+<span class="fu"><a href="../reference/nwd_download_from_googledrive.html">nwd_download_from_googledrive</a></span><span class="op">(</span>folder <span class="op">=</span> <span class="st">"emm_newsbrief"</span>, timeframe <span class="op">=</span> <span class="st">"daily"</span>, language <span class="op">=</span> <span class="st">"it"</span>, filetype <span class="op">=</span> <span class="st">"rds"</span><span class="op">)</span>
+<span class="fu"><a href="../reference/nwd_restore.html">nwd_restore</a></span><span class="op">(</span>folder <span class="op">=</span> <span class="st">"emm_newsbrief"</span>, timeframe <span class="op">=</span> <span class="st">"daily"</span>, language <span class="op">=</span> <span class="st">"it"</span>, filetype <span class="op">=</span> <span class="st">"rds"</span><span class="op">)</span>
 
-<span class="fu"><a href="../reference/nwd_download_from_googledrive.html">nwd_download_from_googledrive</a></span>(<span class="kw">folder</span> <span class="kw">=</span> <span class="st">"tweets"</span>, <span class="kw">timeframe</span> <span class="kw">=</span> <span class="st">"daily"</span>, <span class="kw">language</span> <span class="kw">=</span> <span class="st">"it"</span>, <span class="kw">filetype</span> <span class="kw">=</span> <span class="st">"rds"</span>)
-<span class="fu"><a href="../reference/nwd_restore.html">nwd_restore</a></span>(<span class="kw">folder</span> <span class="kw">=</span> <span class="st">"tweets"</span>, <span class="kw">timeframe</span> <span class="kw">=</span> <span class="st">"daily"</span>, <span class="kw">language</span> <span class="kw">=</span> <span class="st">"it"</span>, <span class="kw">filetype</span> <span class="kw">=</span> <span class="st">"rds"</span>)
+<span class="fu"><a href="../reference/nwd_download_from_googledrive.html">nwd_download_from_googledrive</a></span><span class="op">(</span>folder <span class="op">=</span> <span class="st">"tweets"</span>, timeframe <span class="op">=</span> <span class="st">"daily"</span>, language <span class="op">=</span> <span class="st">"it"</span>, filetype <span class="op">=</span> <span class="st">"rds"</span><span class="op">)</span>
+<span class="fu"><a href="../reference/nwd_restore.html">nwd_restore</a></span><span class="op">(</span>folder <span class="op">=</span> <span class="st">"tweets"</span>, timeframe <span class="op">=</span> <span class="st">"daily"</span>, language <span class="op">=</span> <span class="st">"it"</span>, filetype <span class="op">=</span> <span class="st">"rds"</span><span class="op">)</span>
 
-<span class="fu"><a href="../reference/nwd_download_from_googledrive.html">nwd_download_from_googledrive</a></span>(<span class="kw">folder</span> <span class="kw">=</span> <span class="st">"identifiers"</span>, <span class="kw">timeframe</span> <span class="kw">=</span> <span class="st">"daily"</span>, <span class="kw">language</span> <span class="kw">=</span> <span class="st">"it"</span>, <span class="kw">filetype</span> <span class="kw">=</span> <span class="st">"rds"</span>)
-<span class="fu"><a href="../reference/nwd_restore.html">nwd_restore</a></span>(<span class="kw">folder</span> <span class="kw">=</span> <span class="st">"identifiers"</span>, <span class="kw">timeframe</span> <span class="kw">=</span> <span class="st">"daily"</span>, <span class="kw">language</span> <span class="kw">=</span> <span class="st">"it"</span>, <span class="kw">filetype</span> <span class="kw">=</span> <span class="st">"rds"</span>)
+<span class="fu"><a href="../reference/nwd_download_from_googledrive.html">nwd_download_from_googledrive</a></span><span class="op">(</span>folder <span class="op">=</span> <span class="st">"identifiers"</span>, timeframe <span class="op">=</span> <span class="st">"daily"</span>, language <span class="op">=</span> <span class="st">"it"</span>, filetype <span class="op">=</span> <span class="st">"rds"</span><span class="op">)</span>
+<span class="fu"><a href="../reference/nwd_restore.html">nwd_restore</a></span><span class="op">(</span>folder <span class="op">=</span> <span class="st">"identifiers"</span>, timeframe <span class="op">=</span> <span class="st">"daily"</span>, language <span class="op">=</span> <span class="st">"it"</span>, filetype <span class="op">=</span> <span class="st">"rds"</span><span class="op">)</span>
 
-<span class="fu"><a href="../reference/nwd_download_from_googledrive.html">nwd_download_from_googledrive</a></span>(<span class="kw">folder</span> <span class="kw">=</span> <span class="st">"tweet_links"</span>, <span class="kw">timeframe</span> <span class="kw">=</span> <span class="st">"daily"</span>, <span class="kw">language</span> <span class="kw">=</span> <span class="st">"it"</span>, <span class="kw">filetype</span> <span class="kw">=</span> <span class="st">"rds"</span>)
-<span class="fu"><a href="../reference/nwd_restore.html">nwd_restore</a></span>(<span class="kw">folder</span> <span class="kw">=</span> <span class="st">"tweet_links"</span>, <span class="kw">timeframe</span> <span class="kw">=</span> <span class="st">"daily"</span>, <span class="kw">language</span> <span class="kw">=</span> <span class="st">"it"</span>, <span class="kw">filetype</span> <span class="kw">=</span> <span class="st">"rds"</span>)
+<span class="fu"><a href="../reference/nwd_download_from_googledrive.html">nwd_download_from_googledrive</a></span><span class="op">(</span>folder <span class="op">=</span> <span class="st">"tweet_links"</span>, timeframe <span class="op">=</span> <span class="st">"daily"</span>, language <span class="op">=</span> <span class="st">"it"</span>, filetype <span class="op">=</span> <span class="st">"rds"</span><span class="op">)</span>
+<span class="fu"><a href="../reference/nwd_restore.html">nwd_restore</a></span><span class="op">(</span>folder <span class="op">=</span> <span class="st">"tweet_links"</span>, timeframe <span class="op">=</span> <span class="st">"daily"</span>, language <span class="op">=</span> <span class="st">"it"</span>, filetype <span class="op">=</span> <span class="st">"rds"</span><span class="op">)</span>
 
-<span class="fu"><a href="../reference/nwd_download_from_googledrive.html">nwd_download_from_googledrive</a></span>(<span class="kw">folder</span> <span class="kw">=</span> <span class="st">"network_df"</span>, <span class="kw">timeframe</span> <span class="kw">=</span> <span class="st">"daily"</span>, <span class="kw">language</span> <span class="kw">=</span> <span class="st">"it"</span>, <span class="kw">filetype</span> <span class="kw">=</span> <span class="st">"rds"</span>)
-<span class="fu"><a href="../reference/nwd_restore.html">nwd_restore</a></span>(<span class="kw">folder</span> <span class="kw">=</span> <span class="st">"network_df"</span>, <span class="kw">timeframe</span> <span class="kw">=</span> <span class="st">"daily"</span>, <span class="kw">language</span> <span class="kw">=</span> <span class="st">"it"</span>, <span class="kw">filetype</span> <span class="kw">=</span> <span class="st">"rds"</span>)</pre></body></html></div>
+<span class="fu"><a href="../reference/nwd_download_from_googledrive.html">nwd_download_from_googledrive</a></span><span class="op">(</span>folder <span class="op">=</span> <span class="st">"network_df"</span>, timeframe <span class="op">=</span> <span class="st">"daily"</span>, language <span class="op">=</span> <span class="st">"it"</span>, filetype <span class="op">=</span> <span class="st">"rds"</span><span class="op">)</span>
+<span class="fu"><a href="../reference/nwd_restore.html">nwd_restore</a></span><span class="op">(</span>folder <span class="op">=</span> <span class="st">"network_df"</span>, timeframe <span class="op">=</span> <span class="st">"daily"</span>, language <span class="op">=</span> <span class="st">"it"</span>, filetype <span class="op">=</span> <span class="st">"rds"</span><span class="op">)</span></pre></div>
 </div>
 </div>
   </div>
@@ -170,7 +172,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>

@@ -79,12 +79,6 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="../articles/networkedwebsitesdetector.html">Get started</a>
 </li>
 <li>
@@ -135,13 +129,13 @@
     <p>Find domains related to each across key identifiers</p>
     </div>
 
-    <pre class="usage"><span class='fu'>nwd_find_network</span>(
-  <span class='no'>domain</span>,
-  <span class='kw'>identifiers_df</span> <span class='kw'>=</span> <span class='fu'><a href='nwd_load_identifiers_df.html'>nwd_load_identifiers_df</a></span>(),
-  <span class='kw'>identifiers</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>language</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>max_run_n</span> <span class='kw'>=</span> <span class='fl'>10</span>
-)</pre>
+    <pre class="usage"><span class='fu'>nwd_find_network</span><span class='op'>(</span>
+  <span class='va'>domain</span>,
+  identifiers_df <span class='op'>=</span> <span class='fu'><a href='nwd_load_identifiers_df.html'>nwd_load_identifiers_df</a></span><span class='op'>(</span><span class='op'>)</span>,
+  identifiers <span class='op'>=</span> <span class='cn'>NULL</span>,
+  language <span class='op'>=</span> <span class='cn'>NULL</span>,
+  max_run_n <span class='op'>=</span> <span class='fl'>10</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -182,7 +176,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
 </div>
 
       </footer>
