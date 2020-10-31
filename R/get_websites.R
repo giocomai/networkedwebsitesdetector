@@ -50,7 +50,7 @@ nwd_get_homepage <- function(domain = NULL,
                            error=function(e){
                              
                              readr::write_file(x = paste0("Could not download ", x),
-                                               path = file.path(today_path_homepage_failed, paste0(x, ".txt")))
+                                               file = file.path(today_path_homepage_failed, paste0(x, ".txt")))
                              
                              message(paste0("Could not download ", x, ": "),
                                      conditionMessage(e), "\n")})
