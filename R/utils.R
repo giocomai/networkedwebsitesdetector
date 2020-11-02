@@ -12,7 +12,7 @@ NULL
 #' Check if corresponding information for a given domain exists for a given data type and a given time period
 #'
 #' @param domain A domain name (e.g. "example.com").
-#' @param type Type of file to check, defaults to "homepage". Alternative options: "screenshots".
+#' @param type Type of file to check, defaults to "homepage". Curent alternative options: "screenshots" and "ads".
 #' @param since A date. `nwd_check_if_exists()` returns TRUE only if the given link has been downloaded or (failed to download) after the given date.
 #' @return If `simplify` is TRUE, it returns a logical vector of length 1, either TRUE or FALSE. If `simplify == FALSE`, it returns a data frame with details on the availability of files related to the given domain. 
 #' @examples
@@ -26,8 +26,19 @@ nwd_check_if_exists <- function(domain,
                                 since = Sys.Date()-91,
                                 simplify = TRUE) {
   
+  if (type=="ads") {
+    extension <- ".txt"
+  } else if (type == "screenshot") {
+    extension <- ".png"
+  } else {
+    extension <- ".html"
+  }
+  
   if (is.null(language)==TRUE) {
-    language <- list.dirs(fs::path("homepage"), recursive = FALSE, full.names = FALSE)
+    language <- fs::dir_ls(path = fs::path(type),
+                           recurse = FALSE,
+                           type = "directory") %>% 
+      fs::path_file()
     if (length(language)!=1) {
       stop("More than one language found. Please select one language.")
     }
@@ -44,7 +55,7 @@ nwd_check_if_exists <- function(domain,
     dplyr::filter(date>as.Date(since)) %>% 
     dplyr::mutate(potential_file_location = fs::path(base_path,
                                                       date,
-                                                      paste0(domain, ".html")), 
+                                                      paste0(domain, extension)), 
                   potential_failed_file_location = fs::path(base_path_failed,
                                                              date,
                                                              paste0(domain, ".txt"))) %>% 
