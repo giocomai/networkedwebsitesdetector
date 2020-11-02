@@ -111,7 +111,8 @@ nwd_extract_identifiers <- function(language = NULL,
                                          fb_admins = fb_admins, 
                                          fb_page_id = fb_page_id, 
                                          fb_app_id = fb_app_id, 
-                                         taboola = taboola)
+                                         taboola = taboola) %>% 
+          dplyr::mutate(dplyr::across(.cols = -domain, .fns = as.list))
         
         
         

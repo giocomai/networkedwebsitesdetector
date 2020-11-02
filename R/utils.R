@@ -27,14 +27,14 @@ nwd_check_if_exists <- function(domain,
                                 simplify = TRUE) {
   
   if (is.null(language)==TRUE) {
-    language <- list.dirs(file.path("homepage"), recursive = FALSE, full.names = FALSE)
+    language <- list.dirs(fs::path("homepage"), recursive = FALSE, full.names = FALSE)
     if (length(language)!=1) {
       stop("More than one language found. Please select one language.")
     }
   }
   
-  base_path <- file.path(type, language)
-  base_path_failed <- file.path(paste0(type, "_failed"), language)
+  base_path <- fs::path(type, language)
+  base_path_failed <- fs::path(paste0(type, "_failed"), language)
   
   available_files <- fs::dir_info(path = c(base_path, base_path_failed),
                                   recurse = FALSE,
@@ -42,10 +42,10 @@ nwd_check_if_exists <- function(domain,
     dplyr::transmute(date = as.Date(stringr::str_remove(string = stringr::str_remove(path, pattern = paste0(base_path_failed, "/")), pattern = paste0(base_path, "/")))) %>% 
     dplyr::distinct(date) %>% 
     dplyr::filter(date>as.Date(since)) %>% 
-    dplyr::mutate(potential_file_location = file.path(base_path,
+    dplyr::mutate(potential_file_location = fs::path(base_path,
                                                       date,
                                                       paste0(domain, ".html")), 
-                  potential_failed_file_location = file.path(base_path_failed,
+                  potential_failed_file_location = fs::path(base_path_failed,
                                                              date,
                                                              paste0(domain, ".txt"))) %>% 
     dplyr::mutate(available = fs::file_exists(path = potential_file_location), 
@@ -73,9 +73,9 @@ nwd_check_if_exists <- function(domain,
 
 nwd_load_latest_identifiers_df <- function(language = NULL) {
   if (is.null(language)==TRUE) {
-    language <- list.dirs(file.path("identifiers_long"), recursive = FALSE, full.names = FALSE)
+    language <- list.dirs(fs::path("identifiers_long"), recursive = FALSE, full.names = FALSE)
   }
-  base_path <- file.path("identifiers_long", language)
+  base_path <- fs::path("identifiers_long", language)
   readRDS(file = fs::dir_ls(path = base_path, type = "file") %>% tail(1))
 }
 
@@ -98,21 +98,32 @@ nwd_load_identifiers_df <- function(language = NULL,
                                     keep_duplicates = FALSE,
                                     top_domain_only = TRUE) {
   if (is.null(language)==TRUE) {
-    language <- list.dirs(file.path("identifiers"), recursive = FALSE, full.names = FALSE)
+    language <- list.dirs(fs::path("identifiers"), recursive = FALSE, full.names = FALSE)
   }
-  base_path <- file.path("identifiers", language)
-  today_identifiers_df_long_location <- fs::path("identifiers_long", language,Sys.Date(), paste0(Sys.Date(), "_identifiers_df_long.rds"))
+  base_path <- fs::path("identifiers", language)
+  today_identifiers_df_long_location <- fs::path("identifiers_long",
+                                                 language,
+                                                 Sys.Date(),
+                                                 paste0(Sys.Date(), "_identifiers_df_long.rds"))
   
   if (cache == TRUE & long==TRUE & fs::file_exists(path = today_identifiers_df_long_location)) {
     return(readRDS(file = today_identifiers_df_long_location))
   }
-  file_list <- fs::dir_ls(path = base_path, recurse = TRUE, type = "file", glob = "*.rds")
+  
+  file_list <- fs::dir_ls(path = base_path,
+                          recurse = TRUE,
+                          type = "file",
+                          glob = "*.rds")
+  
   message("Load identifiers\n")
-  pb <- dplyr::progress_estimated(length(file_list))
+  
+  pb <- progress::progress_bar$new(total = length(file_list))
+  
   identifiers_df <- purrr::map_dfr(.x = file_list,
                                    .f = function (x) {
-                                     pb$tick()$print()
-                                     readRDS(file = x)
+                                     pb$tick()
+                                     readr::read_rds(file = x) %>% 
+                                       dplyr::mutate(dplyr::across(.cols = -domain, .fns = as.list))
                                    }, .id = "date") %>% 
     dplyr::mutate(date = as.Date(fs::path_file(fs::path_dir(date)))) %>% 
     dplyr::mutate(domain = stringr::str_remove(string = domain, pattern = "^www\\."))
@@ -121,8 +132,8 @@ nwd_load_identifiers_df <- function(language = NULL,
     message("\nRemove subdomains\n")
     
     # TODO get top_domain_only to work
-    networkedwebsitesdetector::public_suffix_list %>% 
-      dplyr::mutate(n_dot = stringr::str_count(string = list, pattern = stringr::fixed(".")))
+    # networkedwebsitesdetector::public_suffix_list %>% 
+    #   dplyr::mutate(n_dot = stringr::str_count(string = list, pattern = stringr::fixed(".")))
     
     identifiers_df <- 
       identifiers_df %>% 
@@ -140,10 +151,10 @@ nwd_load_identifiers_df <- function(language = NULL,
   if (long == TRUE) {
     message("\nConvert into long data frame\n")
     identifiers_to_process <- colnames(identifiers_df)[!is.element(colnames(identifiers_df), c("date", "domain", "network_id"))]
-    pb <- dplyr::progress_estimated(length(identifiers_to_process))
+    pb <- progress::progress_bar$new(total = length(identifiers_to_process))
     identifiers_df_long <- purrr::map_dfr(.x = identifiers_to_process,
                                           .f = function (x) {
-                                            pb$tick()$print()
+                                            pb$tick()
                                             temp <- identifiers_df %>% 
                                               dplyr::select(date, domain, x) %>% 
                                               tidyr::unnest(cols = x, keep_empty = TRUE)
@@ -190,9 +201,9 @@ nwd_clean_files <- function(min_size = 0,
                             remove_exceeding = FALSE,
                             language = NULL) {
   if (is.null(language)==TRUE) {
-    language <- list.dirs(file.path("homepage"), recursive = FALSE, full.names = FALSE)
+    language <- list.dirs(fs::path("homepage"), recursive = FALSE, full.names = FALSE)
   }
-  file_info <- fs::dir_info(path = file.path("homepage", language), recurse = TRUE, type = "file")
+  file_info <- fs::dir_info(path = fs::path("homepage", language), recurse = TRUE, type = "file")
   
   file_exceeding <- file_info %>%
     dplyr::filter(size <= fs::as_fs_bytes(x = min_size) | size > fs::as_fs_bytes(x = max_size))
