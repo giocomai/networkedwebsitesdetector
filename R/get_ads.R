@@ -40,9 +40,9 @@ nwd_get_ads <- function(domain = NULL,
       dplyr::pull(domain)
   }
   
-  pb <- dplyr::progress_estimated(length(domain))
+  pb <- progress::progress_bar$new(total = length(domain))
   purrr::walk(.x = domain,
-              .f =  function(x) {pb$tick()$print()
+              .f =  function(x) {pb$tick()
                 if (networkedwebsitesdetector::nwd_check_if_exists(domain = x,
                                                                    type = "ads",
                                                                    since = since,
