@@ -23,7 +23,8 @@ Imports:
     tidytext,
     lubridate,
     ggraph,
-    tidygraph
+    tidygraph,
+    progress
 RoxygenNote: 7.1.1
 URL: https://github.com/giocomai/networkedwebsitesdetector
 BugReports: https://github.com/giocomai/networkedwebsitesdetector/issues
