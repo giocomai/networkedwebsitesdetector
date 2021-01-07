@@ -15,7 +15,7 @@ nwd_check_if_exists(
 \arguments{
 \item{domain}{A domain name (e.g. "example.com").}
 
-\item{type}{Type of file to check, defaults to "homepage". Alternative options: "screenshots".}
+\item{type}{Type of file to check, defaults to "homepage". Curent alternative options: "screenshots" and "ads".}
 
 \item{since}{A date. `nwd_check_if_exists()` returns TRUE only if the given link has been downloaded or (failed to download) after the given date.}
 }

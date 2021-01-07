@@ -198,8 +198,66 @@ nwd_extract_identifiers_from_backup <- function(language,
                                     path = fs::path("nwd_temp", "temp.tar.gz"))
         untar(tarfile = fs::path("nwd_temp", "temp.tar.gz"), exdir = "nwd_temp")
       }
-      nwd_extract_identifiers(language = language, progress_bar = TRUE, temp = TRUE)
+      nwd_extract_identifiers(language = language,
+                              progress_bar = TRUE,
+                              temp = TRUE)
       fs::dir_delete(path = "nwd_temp")
     }
   }
+}
+
+#' Extract identifiers from ads.txt files
+#' 
+#' Extract identifiers from ads.txt files, typically downloaded with `nwd_get_ads()`
+#'
+#' @param language A character vector of length one corresponding to a language two-letter code. Defaults to NULL. If NULL, processes available language. If more than one, throws error. 
+#' @param sample Defaults to NULL. If given, it processess only a sample of the available files of the size given with this parameter. 
+#' @param progress_bar 
+#'
+#' @return
+#' @export
+#'
+#' @examples
+nwd_extract_identifiers_from_ads <- function(language = NULL,
+                                             progress_bar = TRUE,
+                                             sample = NULL) {
+  
+  
+  fs::dir_create("ads_identifiers_csv")
+  fs::dir_create("ads_identifiers_rds")
+  purrr::walk(.x = languages,
+              .f = function(language_x) {
+                all_txt <- fs::dir_ls(path = fs::path("ads", language_x),
+                                      recurse = TRUE,
+                                      type = "file",
+                                      glob = "*.txt")
+                
+                if (length(all_txt)==0) {
+                  return(NULL)
+                }
+                
+                names(all_txt) <- fs::path_file(all_txt) %>%
+                  stringr::str_remove(pattern = "\\.txt$")
+                
+                identifiers_df <- purrr::map_dfr(.x = all_txt,
+                                                 .f = function(x){
+                                                   readr::read_csv(file = x,
+                                                                   col_names = c("partner",
+                                                                                 "identifier",
+                                                                                 "type",
+                                                                                 "code"),
+                                                                   col_types = cols(partner = col_character(),
+                                                                                    identifier = col_character(), 
+                                                                                    type = col_character(), 
+                                                                                    code = col_character()),
+                                                                   trim_ws = TRUE,
+                                                                   skip_empty_rows = TRUE)
+                                                 }, .id = "domain") %>% 
+                  dplyr::filter(str_detect(string = partner, pattern = "#", negate = TRUE)) %>% 
+                  dplyr::filter(str_detect(string = partner, pattern = "<", negate = TRUE)) %>% 
+                  dplyr::filter(is.na(partner)==FALSE) %>% 
+                  dplyr::distinct()
+              }
+  )
+  
 }
