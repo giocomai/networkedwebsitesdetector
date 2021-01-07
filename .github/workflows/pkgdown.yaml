@@ -6,7 +6,7 @@ name: pkgdown
 
 jobs:
   pkgdown:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
       - run: git config user.name "GitHub Actions" && git config user.email "actions@users.noreply.github.com"
@@ -17,6 +17,9 @@ jobs:
       
       - name: install libcurl4
         run: sudo apt-get install libcurl4-openssl-dev
+        
+      - name: install libgit2-dev
+        run: sudo apt-get install libgit2-dev
 
       - name: install harfbuzz
         run: sudo apt-get install libharfbuzz-dev libfribidi-dev
@@ -31,8 +34,8 @@ jobs:
         uses: actions/cache@v1
         with:
           path: ${{ env.R_LIBS_USER }}
-          key: ubuntu-18.04-${{ hashFiles('.github/depends.Rds') }}
-          restore-keys: ubuntu-18.04
+          key: ubuntu-20.04-${{ hashFiles('.github/depends.Rds') }}
+          restore-keys: ubuntu-20.04
 
       - name: Install dependencies
         run: |
