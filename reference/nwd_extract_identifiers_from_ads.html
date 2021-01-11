@@ -45,6 +45,8 @@
 
 
 
+
+
 <!-- mathjax -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script>
@@ -129,11 +131,7 @@
     <p>Extract identifiers from ads.txt files, typically downloaded with `nwd_get_ads()`</p>
     </div>
 
-    <pre class="usage"><span class='fu'>nwd_extract_identifiers_from_ads</span><span class='op'>(</span>
-  language <span class='op'>=</span> <span class='cn'>NULL</span>,
-  progress_bar <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  sample <span class='op'>=</span> <span class='cn'>NULL</span>
-<span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>nwd_extract_identifiers_from_ads</span><span class='op'>(</span>language <span class='op'>=</span> <span class='cn'>NULL</span>, sample <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -143,10 +141,6 @@
       <td><p>A character vector of length one corresponding to a language two-letter code. Defaults to NULL. If NULL, processes available language. If more than one, throws error.</p></td>
     </tr>
     <tr>
-      <th>progress_bar</th>
-      <td></td>
-    </tr>
-    <tr>
       <th>sample</th>
       <td><p>Defaults to NULL. If given, it processess only a sample of the available files of the size given with this parameter.</p></td>
     </tr>
@@ -154,10 +148,15 @@
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    
+    <p>Nothing, used for its side effects, i.e. storing identifiers in csv format by language in the `ads_identifiers_csv` folder.</p>
+
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='fu'>nwd_extract_identifiers_from_ads</span><span class='op'>(</span><span class='op'>)</span>
+<span class='op'>}</span>
 
 
-
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
