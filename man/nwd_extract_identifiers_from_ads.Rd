@@ -4,22 +4,23 @@
 \alias{nwd_extract_identifiers_from_ads}
 \title{Extract identifiers from ads.txt files}
 \usage{
-nwd_extract_identifiers_from_ads(
-  language = NULL,
-  progress_bar = TRUE,
-  sample = NULL
-)
+nwd_extract_identifiers_from_ads(language = NULL, sample = NULL)
 }
 \arguments{
 \item{language}{A character vector of length one corresponding to a language two-letter code. Defaults to NULL. If NULL, processes available language. If more than one, throws error.}
 
-\item{progress_bar}{}
-
 \item{sample}{Defaults to NULL. If given, it processess only a sample of the available files of the size given with this parameter.}
 }
 \value{
-
+Nothing, used for its side effects, i.e. storing identifiers in csv format by language in the `ads_identifiers_csv` folder.
 }
 \description{
 Extract identifiers from ads.txt files, typically downloaded with `nwd_get_ads()`
+}
+\examples{
+\dontrun{
+nwd_extract_identifiers_from_ads()
+}
+
+
 }

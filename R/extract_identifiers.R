@@ -212,52 +212,118 @@ nwd_extract_identifiers_from_backup <- function(language,
 #'
 #' @param language A character vector of length one corresponding to a language two-letter code. Defaults to NULL. If NULL, processes available language. If more than one, throws error. 
 #' @param sample Defaults to NULL. If given, it processess only a sample of the available files of the size given with this parameter. 
-#' @param progress_bar 
 #'
-#' @return
+#' @return Nothing, used for its side effects, i.e. storing identifiers in csv format by language in the `ads_identifiers_csv` folder.
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' nwd_extract_identifiers_from_ads()
+#' }
+#' 
+#' 
 nwd_extract_identifiers_from_ads <- function(language = NULL,
-                                             progress_bar = TRUE,
                                              sample = NULL) {
-  
-  
   fs::dir_create("ads_identifiers_csv")
-  fs::dir_create("ads_identifiers_rds")
-  purrr::walk(.x = languages,
-              .f = function(language_x) {
-                all_txt <- fs::dir_ls(path = fs::path("ads", language_x),
-                                      recurse = TRUE,
-                                      type = "file",
-                                      glob = "*.txt")
-                
-                if (length(all_txt)==0) {
-                  return(NULL)
-                }
-                
-                names(all_txt) <- fs::path_file(all_txt) %>%
-                  stringr::str_remove(pattern = "\\.txt$")
-                
-                identifiers_df <- purrr::map_dfr(.x = all_txt,
-                                                 .f = function(x){
-                                                   readr::read_csv(file = x,
-                                                                   col_names = c("partner",
-                                                                                 "identifier",
-                                                                                 "type",
-                                                                                 "code"),
-                                                                   col_types = cols(partner = col_character(),
-                                                                                    identifier = col_character(), 
-                                                                                    type = col_character(), 
-                                                                                    code = col_character()),
-                                                                   trim_ws = TRUE,
-                                                                   skip_empty_rows = TRUE)
-                                                 }, .id = "domain") %>% 
-                  dplyr::filter(str_detect(string = partner, pattern = "#", negate = TRUE)) %>% 
-                  dplyr::filter(str_detect(string = partner, pattern = "<", negate = TRUE)) %>% 
-                  dplyr::filter(is.na(partner)==FALSE) %>% 
-                  dplyr::distinct()
-              }
-  )
   
+  if (is.null(language)) {
+    language <- fs::dir_ls(
+      path = "ads",
+      recurse = FALSE,
+      type = "directory"
+    ) %>%
+      fs::path_file()
+  }
+  
+  purrr::walk(
+    .x = language,
+    .f = function(language_x) {
+      all_txt <- fs::dir_ls(
+        path = fs::path("ads", language_x),
+        recurse = TRUE,
+        type = "file",
+        glob = "*.txt"
+      )
+      
+      if (length(all_txt) == 0) {
+        return(NULL)
+      }
+      
+      if (is.null(sample)==FALSE) {
+        all_txt <- sample(x = all_txt, size = sample)
+      }
+      
+      names(all_txt) <- fs::path_file(all_txt) %>%
+        fs::path_ext_remove()
+      
+      pb <- progress::progress_bar$new(total = length(all_txt))
+      
+      identifiers_df <- purrr::map_dfr(
+        .x = all_txt,
+        .f = function(x) {
+          
+          pb$tick()
+          
+          txt <- readr::read_lines(file = x)
+          
+          if (is.na(txt[1])==TRUE) {
+            NULL
+          } else if (stringr::str_detect(string = txt[1], pattern = stringr::fixed("<"))) {
+            NULL
+          } else if (length(txt)>1 & stringr::str_detect(string = txt[2], pattern = stringr::fixed("<"))) {
+            NULL
+          } else {
+            
+            first_line_with_data <- c(stringr::str_detect(string = txt,
+                                                          pattern = ","),
+                                      stringr::str_starts(string = txt,
+                                                          pattern = "#",
+                                                          negate = TRUE)) %>%
+              min()
+            
+            
+            min(na.rm = TRUE)
+            
+            suppressWarnings(readr::read_delim(
+              file = x,
+              delim = ",",
+              col_names = c(
+                "partner",
+                "identifier",
+                "type",
+                "code"
+              ),
+              col_types = readr::cols(
+                partner = readr::col_character(),
+                identifier = readr::col_character(),
+                type = readr::col_character(),
+                code = readr::col_character()
+              ),
+              comment = "#",
+              trim_ws = TRUE,
+              skip = first_line_with_data-1,
+              skip_empty_rows = TRUE,
+            )
+            )
+          }
+          
+          
+          # if (check == TRUE & ncol(temp_df)<2) {
+          #   warning(paste("Only one column found in", sQuote(x)))
+          # } else {
+          #   temp_df
+          # }
+          
+        }, .id = "domain"
+      ) %>%
+        dplyr::filter(is.na(partner) == FALSE) %>%
+        dplyr::distinct()
+      
+      readr::write_csv(
+        x = identifiers_df,
+        file = fs::path("ads_identifiers_csv", paste0("ads_identifiers_", language_x, ".csv"))
+      )
+    }
+  )
 }
+
