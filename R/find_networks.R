@@ -38,10 +38,14 @@ nwd_find_network <- function(domain,
     tidyr::drop_na() 
   
   if (is.null(language)) {
-    language <-  fs::dir_ls(path = fs::path("identifiers"),
-                            recurse = FALSE,
-                            type = "directory") %>% 
-      fs::path_file()
+    if (fs::file_exists(path = fs::path("identifiers"))==FALSE) {
+      language <-  fs::dir_ls(path = fs::path("identifiers"),
+                              recurse = FALSE,
+                              type = "directory") %>% 
+        fs::path_file()
+    } else {
+      stop("Language not given and `identifiers` folder not found locally.")
+    }
   }
   
   for (i in language) {
@@ -207,9 +211,10 @@ nwd_create_domain_graph_all_connections <- function(domains,
 
 #' Create a graph of the network of one or more domains
 #'
-#'
+#' @param network A character vector of length one, typically a domain name, or a domain generated with `nwd_find_network()`.
 #' @param identifiers_df A data frame, typically created with extract extract_identifiers() and loaded with load_identifiers_df().
-#' @return A data.frame (a tibble) including a network_id column grouping all domains that have elements in common.
+#' @param language Defaults to NULL. If given, looks only for network within a given language.
+#' @return A data.frame (a tibble) including a network_id column grouping all domains that have elements in common. If `plot = TRUE`, a ggplot objext.
 #' @examples
 #' 
 #' @export
@@ -217,14 +222,16 @@ nwd_create_domain_graph_all_connections <- function(domains,
 #' 
 
 nwd_show_network <- function(network,
-                              identifiers_df = nwd_load_identifiers_df(),
-                              identifiers = NULL,
-                              only_shared_identifiers = TRUE, 
-                              plot = TRUE) {
+                             identifiers_df = nwd_load_identifiers_df(),
+                             identifiers = NULL,
+                             language = NULL,
+                             only_shared_identifiers = TRUE, 
+                             plot = TRUE) {
   if (is.character(network) == TRUE & length(network)==1) {
     network <- nwd_find_network(domain = network,
                                 identifiers_df = identifiers_df,
-                                identifiers = identifiers)
+                                identifiers = identifiers,
+                                language = language)
   }
   
   if (is.null(identifiers)) {

@@ -8,15 +8,20 @@ nwd_show_network(
   network,
   identifiers_df = nwd_load_identifiers_df(),
   identifiers = NULL,
+  language = NULL,
   only_shared_identifiers = TRUE,
   plot = TRUE
 )
 }
 \arguments{
+\item{network}{A character vector of length one, typically a domain name, or a domain generated with `nwd_find_network()`.}
+
 \item{identifiers_df}{A data frame, typically created with extract extract_identifiers() and loaded with load_identifiers_df().}
+
+\item{language}{Defaults to NULL. If given, looks only for network within a given language.}
 }
 \value{
-A data.frame (a tibble) including a network_id column grouping all domains that have elements in common.
+A data.frame (a tibble) including a network_id column grouping all domains that have elements in common. If `plot = TRUE`, a ggplot objext.
 }
 \description{
 Create a graph of the network of one or more domains
