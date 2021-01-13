@@ -8,12 +8,15 @@ nwd_find_network(
   domain,
   identifiers_df = nwd_load_identifiers_df(),
   identifiers = NULL,
+  identifiers_to_exclude = default_excluded_df,
   language = NULL,
   max_run_n = 10
 )
 }
 \arguments{
 \item{identifiers_df}{A dataframe of indentifiers in the long format, typically created with `nwd_load_identifiers_df()`.}
+
+\item{identifiers_to_exclude}{A dataframe with two columns, `type` and `id`. See `default_excluded_df` for an example.}
 
 \item{language}{A character vector of language two letter codes. Defaults to NULL. If NULL, processes available languages.}
 

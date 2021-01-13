@@ -1,6 +1,7 @@
 #' Find domains related to each across key identifiers
 #'
 #' @param identifiers_df A dataframe of indentifiers in the long format, typically created with `nwd_load_identifiers_df()`.
+#' @param identifiers_to_exclude A dataframe with two columns, `type` and `id`. See `default_excluded_df` for an example.
 #' @param language A character vector of language two letter codes. Defaults to NULL. If NULL, processes available languages.
 #' @param run_n Number of times to go through all identifiers. For example, if a new domain is found within the network through a common fb_app_id, it may be useful to see if the new domain has any ca_pub codes with others. 
 #' @return Nothing, used for its side effects. 
@@ -12,6 +13,7 @@
 nwd_find_network <- function(domain,
                              identifiers_df = nwd_load_identifiers_df(),
                              identifiers = NULL,
+                             identifiers_to_exclude = default_excluded_df, 
                              language = NULL,
                              max_run_n = 10) {
   if (is.null(identifiers)) {
@@ -19,12 +21,9 @@ nwd_find_network <- function(domain,
   }
   
   identifiers_df$network_id <- NULL
-  
-  ## clean up
-  # TODO allow customisation
-  clean_up_id <- tibble::tibble(id = c(paste0("ua_", default_excluded_ua$id),
-                                       paste0("fb_admins_", default_excluded_fb_admins$id),
-                                       paste0("fb_app_id_", default_excluded_fb_app_id$id)))
+
+  clean_up_id <- identifiers_to_exclude %>% 
+    dplyr::transmute(id = paste0(type, "_", id))
   
   identifiers_df <- identifiers_df %>% 
     dplyr::filter(is.element(identifier, identifiers)) %>% 

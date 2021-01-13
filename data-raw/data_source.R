@@ -28,6 +28,23 @@ default_excluded_ua <-
 
 usethis::use_data(default_excluded_ua, overwrite = TRUE)
 
+default_excluded_taboola <- 
+  tibble::tribble(~id, ~description,
+                  "unip", "misclassified") 
+
+usethis::use_data(default_excluded_taboola, overwrite = TRUE)
+
+
+default_excluded_df <- dplyr::bind_rows(fb_admins = default_excluded_fb_admins, 
+                                        fb_app_id = default_excluded_fb_app_id,
+                                        ua = default_excluded_ua,
+                                        taboola = default_excluded_taboola,
+                                        .id = "type") %>% 
+  dplyr::select(-description)
+
+usethis::use_data(default_excluded_df, overwrite = TRUE)
+
+
 default_identifiers <- c("ua",
                          "ca_pub",
                          "fb_admins",
