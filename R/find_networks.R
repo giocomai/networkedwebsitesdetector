@@ -20,22 +20,21 @@ nwd_find_network <- function(domain,
   
   identifiers_df$network_id <- NULL
   
+  ## clean up
+  # TODO allow customisation
+  clean_up_id <- tibble::tibble(id = c(paste0("ua_", default_excluded_ua$id),
+                                       paste0("fb_admins_", default_excluded_fb_admins$id),
+                                       paste0("fb_app_id_", default_excluded_fb_app_id$id)))
+  
   identifiers_df <- identifiers_df %>% 
+    dplyr::filter(is.element(identifier, identifiers)) %>% 
     dplyr::mutate(id = dplyr::if_else(condition = id=="",
                                       true = as.character(NA),
                                       false = paste(identifier, id, sep = "_"))) %>% 
-    tidyr::drop_na()
+    tidyr::drop_na() %>% 
+    dplyr::anti_join(y = clean_up_id,
+                     by = "id")
   
-  ## clean up
-  # TODO allow customisation
-  clean_up_id <- c(paste0("ua_", default_excluded_ua$id),
-                   paste0("fb_admins_", default_excluded_fb_admins$id),
-                   paste0("fb_app_id_", default_excluded_fb_app_id$id))
-  
-  identifiers_df$id[is.element(el = identifiers_df$id, set = clean_up_id)] <- NA
-  
-  identifiers_df <- identifiers_df %>%
-    tidyr::drop_na() 
   
   if (is.null(language)) {
     if (fs::file_exists(path = fs::path("identifiers"))==FALSE) {
