@@ -135,6 +135,7 @@
   <span class='va'>domain</span>,
   identifiers_df <span class='op'>=</span> <span class='fu'><a href='nwd_load_identifiers_df.html'>nwd_load_identifiers_df</a></span><span class='op'>(</span><span class='op'>)</span>,
   identifiers <span class='op'>=</span> <span class='cn'>NULL</span>,
+  identifiers_to_exclude <span class='op'>=</span> <span class='va'>default_excluded_df</span>,
   language <span class='op'>=</span> <span class='cn'>NULL</span>,
   max_run_n <span class='op'>=</span> <span class='fl'>10</span>
 <span class='op'>)</span></pre>
@@ -145,6 +146,10 @@
     <tr>
       <th>identifiers_df</th>
       <td><p>A dataframe of indentifiers in the long format, typically created with `nwd_load_identifiers_df()`.</p></td>
+    </tr>
+    <tr>
+      <th>identifiers_to_exclude</th>
+      <td><p>A dataframe with two columns, `type` and `id`. See `default_excluded_df` for an example.</p></td>
     </tr>
     <tr>
       <th>language</th>
