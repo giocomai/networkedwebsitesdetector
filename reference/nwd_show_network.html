@@ -135,6 +135,7 @@
   <span class='va'>network</span>,
   identifiers_df <span class='op'>=</span> <span class='fu'><a href='nwd_load_identifiers_df.html'>nwd_load_identifiers_df</a></span><span class='op'>(</span><span class='op'>)</span>,
   identifiers <span class='op'>=</span> <span class='cn'>NULL</span>,
+  language <span class='op'>=</span> <span class='cn'>NULL</span>,
   only_shared_identifiers <span class='op'>=</span> <span class='cn'>TRUE</span>,
   plot <span class='op'>=</span> <span class='cn'>TRUE</span>
 <span class='op'>)</span></pre>
@@ -143,14 +144,22 @@
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
+      <th>network</th>
+      <td><p>A character vector of length one, typically a domain name, or a domain generated with `nwd_find_network()`.</p></td>
+    </tr>
+    <tr>
       <th>identifiers_df</th>
       <td><p>A data frame, typically created with extract extract_identifiers() and loaded with load_identifiers_df().</p></td>
+    </tr>
+    <tr>
+      <th>language</th>
+      <td><p>Defaults to NULL. If given, looks only for network within a given language.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A data.frame (a tibble) including a network_id column grouping all domains that have elements in common.</p>
+    <p>A data.frame (a tibble) including a network_id column grouping all domains that have elements in common. If `plot = TRUE`, a ggplot objext.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
