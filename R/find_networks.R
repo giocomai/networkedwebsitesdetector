@@ -127,7 +127,9 @@ nwd_add_network_id <- function(identifiers_df = nwd_load_identifiers_df(),
       pb$tick()$print()
       
       if (is.na(identifiers_df$network_id[j])==TRUE) {
-        full_network <- nwd_find_network(domain = identifiers_df$domain[j], identifiers_df = identifiers_df)
+        full_network <- nwd_find_network(domain = identifiers_df$domain[j],
+                                         identifiers_df = identifiers_df, 
+                                         language = language)
         
         if (nrow(full_network)>0) {
           identifiers_df$network_id[identifiers_df$domain %in% unique(full_network$domain)] <- min(j, identifiers_df$network_id[identifiers_df$domain %in% unique(full_network$domain)], na.rm = TRUE)
